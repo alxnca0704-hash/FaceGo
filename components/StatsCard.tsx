@@ -13,7 +13,7 @@ const StatsCard = ({ icon, name, total }: Stats) => {
         {total}
       </Text>
       <Text
-        className="text-white  font-sans-extrabold"
+        className="text-white font-sans-extrabold"
         style={{ fontSize: s(15) }}
       >
         {name}

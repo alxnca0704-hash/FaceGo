@@ -40,8 +40,8 @@ export const employees: Employee[] = [
     id: "2",
     employee_id: "EMP-002",
     name: "Bob Martinez",
-    time_in: "08:45 AM",
-    time_out: "05:00 PM",
+    time_in: null,
+    time_out: null,
     status: "Absent",
   },
   {
@@ -56,8 +56,8 @@ export const employees: Employee[] = [
     id: "4",
     employee_id: "EMP-004",
     name: "David Chen",
-    time_in: "08:45 AM",
-    time_out: "05:00 PM",
+    time_in: null,
+    time_out: null,
     status: "Absent",
   },
   {

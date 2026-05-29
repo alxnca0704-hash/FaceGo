@@ -14,7 +14,7 @@ const dashboard = () => {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       <FlatList
-        data={employees.slice(0, 5)} // shows max 3 items
+        data={employees.slice(0, 5)}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{

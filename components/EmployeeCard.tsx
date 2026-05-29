@@ -26,8 +26,8 @@ const EmployeeCard = ({
       </View>
       <Text className="text-gray-400 mb-1">{employee_id}</Text>
       <View className="flex-row justify-start gap-10">
-        <Text>Time in: {time_in}</Text>
-        <Text>Time out: {time_out}</Text>
+        <Text>Time in: {time_in ?? "N/A"}</Text>
+        <Text>Time out: {time_out ?? "N/A"}</Text>
       </View>
     </View>
   );

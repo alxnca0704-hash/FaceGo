@@ -36,7 +36,7 @@ export const spacing = {
 
 export const components = {
   tabBar: {
-    height: spacing[16], // was spacing[18] — taller bar
+    height: spacing[16],
 
     radius: spacing[10], // was spacing[8] — rounder bar
     iconFrame: spacing[14], // was spacing[12] — bigger icon frame
