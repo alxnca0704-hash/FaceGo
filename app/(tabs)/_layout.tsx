@@ -1,66 +1,70 @@
-import { tabs } from "@/constant/data";
-import { colors, components } from "@/constant/theme";
-import clsx from "clsx";
+import { components } from "@/constant/theme";
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { Image, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const TabIcon = ({ focused, icon }: TabIconProps) => {
-  return (
-    <View className="tabs-icon">
-      <View
-        className={clsx("tabs-pill", focused && "tabs-active")}
-        style={{ borderRadius: 500 }}
-      >
-        <Image source={icon} resizeMode="contain" className="tabs-glyph" />
-      </View>
-    </View>
-  );
-};
-
-const TabLayout = () => {
-  const insets = useSafeAreaInsets(); // ✅ now valid inside a function body
-  const tabBar = components.tabBar;
+export default function TabLayout() {
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: false,
+        tabBarActiveTintColor: "#000",
+        tabBarInactiveTintColor: "#999",
         tabBarStyle: {
-          position: "absolute",
-          bottom: Math.max(insets.bottom, tabBar.horizontalInset),
-          height: tabBar.height,
-          marginHorizontal: tabBar.horizontalInset * 3,
-          borderRadius: tabBar.radius,
-          backgroundColor: colors.primary,
-          borderTopWidth: 0,
-          elevation: 0,
+          backgroundColor: "#fff",
+          borderTopWidth: 1,
+          borderTopColor: "#eee",
+          height: components.tabBar.height + insets.bottom,
+          paddingBottom: insets.bottom + components.tabBar.itemPaddingVertical,
+          paddingTop: components.tabBar.itemPaddingVertical,
         },
-        tabBarItemStyle: {
-          paddingVertical: tabBar.height / 2 - tabBar.iconFrame / 1.6,
-        },
-        tabBarIconStyle: {
-          width: tabBar.iconFrame,
-          height: tabBar.iconFrame,
-          alignItems: "center",
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "600",
         },
       }}
     >
-      {tabs.map((tab) => (
-        <Tabs.Screen
-          key={tab.name}
-          name={tab.name}
-          options={{
-            title: tab.title,
-            tabBarIcon: ({ focused }) => (
-              <TabIcon focused={focused} icon={tab.icon} />
-            ),
-          }}
-        />
-      ))}
+      <Tabs.Screen
+        name="dashboard"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              color={color}
+              size={22}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="employee"
+        options={{
+          title: "Employee",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "people" : "people-outline"}
+              color={color}
+              size={22}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="attendance"
+        options={{
+          title: "Attendance",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "calendar" : "calendar-outline"}
+              color={color}
+              size={22}
+            />
+          ),
+        }}
+      />
     </Tabs>
   );
-};
-
-export default TabLayout;
+}

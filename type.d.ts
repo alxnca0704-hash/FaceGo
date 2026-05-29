@@ -18,6 +18,15 @@ declare global {
     name: string;
     total: number;
   }
+
+  interface Employee {
+    id: string;
+    employee_id: string;
+    name: string;
+    time_in: string | null;
+    time_out: string | null;
+    status: "Present" | "Absent";
+  }
 }
 
 export { };

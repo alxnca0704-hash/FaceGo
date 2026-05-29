@@ -26,3 +26,46 @@ export const STATS: Stats[] = [
     total: 15,
   },
 ];
+
+export const employees: Employee[] = [
+  {
+    id: "1",
+    employee_id: "EMP-001",
+    name: "Alice Johnson",
+    time_in: "08:02 AM",
+    time_out: "05:10 PM",
+    status: "Present",
+  },
+  {
+    id: "2",
+    employee_id: "EMP-002",
+    name: "Bob Martinez",
+    time_in: null,
+    time_out: null,
+    status: "Absent",
+  },
+  {
+    id: "3",
+    employee_id: "EMP-003",
+    name: "Carol White",
+    time_in: "08:45 AM",
+    time_out: "05:00 PM",
+    status: "Present",
+  },
+  {
+    id: "4",
+    employee_id: "EMP-004",
+    name: "David Chen",
+    time_in: null,
+    time_out: null,
+    status: "Absent",
+  },
+  {
+    id: "5",
+    employee_id: "EMP-005",
+    name: "Eva Nguyen",
+    time_in: "07:58 AM",
+    time_out: "04:55 PM",
+    status: "Present",
+  },
+];
