@@ -4,16 +4,16 @@ import { s, vs } from "react-native-size-matters";
 
 const StatsCard = ({ icon, name, total }: Stats) => {
   return (
-    <View style={style.card} className="bg-background">
+    <View style={style.card} className="bg-black">
       <Image source={icon} style={style.icon} />
       <Text
-        className="text-foreground font-sans-extrabold"
+        className="text-white font-sans-extrabold"
         style={{ fontSize: 50, lineHeight: 50, includeFontPadding: false }}
       >
         {total}
       </Text>
       <Text
-        className="text-foreground font-sans-extrabold"
+        className="text-white  font-sans-extrabold"
         style={{ fontSize: s(15) }}
       >
         {name}
