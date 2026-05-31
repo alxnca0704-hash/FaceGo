@@ -3,6 +3,7 @@ import QuickActionCard from "@/components/QuickActionCard";
 import StatsCard from "@/components/StatsCard";
 import { employees, QUICK_ACTIONS, STATS } from "@/constant/data";
 import { icons } from "@/constant/icons";
+import { images } from "@/constant/images";
 import { styled } from "nativewind";
 import React from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
@@ -29,9 +30,16 @@ const dashboard = () => {
               className="flex-row items-center justify-between"
               style={{ marginBottom: vs(30) }}
             >
-              <Text className="text-black font-sans-extrabold text-4xl">
-                Dashboard
-              </Text>
+              <View className="flex-row items-center" style={{ gap: s(10) }}>
+                <Image
+                  source={images.denr}
+                  style={{ width: s(40), height: s(40) }}
+                  resizeMode="contain"
+                />
+                <Text className="text-black font-sans-extrabold text-4xl">
+                  Dashboard
+                </Text>
+              </View>
               <Image
                 source={icons.burger}
                 style={{ width: s(40), height: vs(40) }}

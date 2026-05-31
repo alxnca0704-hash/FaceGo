@@ -5,7 +5,14 @@ import { employees as initialEmployees } from "@/constant/data";
 import { icons } from "@/constant/icons";
 import { styled } from "nativewind";
 import React, { useState } from "react";
-import { Alert, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { s, vs } from "react-native-size-matters";
 
@@ -33,8 +40,8 @@ const EmployeeScreen = () => {
       // Edit logic
       setEmployeeList(
         employeeList.map((emp) =>
-          emp.id === editingEmployee.id ? { ...emp, ...data } : emp
-        )
+          emp.id === editingEmployee.id ? { ...emp, ...data } : emp,
+        ),
       );
       Alert.alert("Success", "Employee updated successfully");
     } else {
@@ -81,14 +88,16 @@ const EmployeeScreen = () => {
                   text: "Delete",
                   style: "destructive",
                   onPress: () => {
-                    setEmployeeList(employeeList.filter((e) => e.id !== employee.id));
+                    setEmployeeList(
+                      employeeList.filter((e) => e.id !== employee.id),
+                    );
                   },
                 },
-              ]
+              ],
             );
           },
         },
-      ]
+      ],
     );
   };
 
@@ -112,7 +121,10 @@ const EmployeeScreen = () => {
               <Text className="text-black font-sans-extrabold text-4xl">
                 Employees
               </Text>
-              <TouchableOpacity onPress={handleOpenAddModal} activeOpacity={0.7}>
+              <TouchableOpacity
+                onPress={handleOpenAddModal}
+                activeOpacity={0.7}
+              >
                 <Image
                   source={icons.add}
                   style={{ width: s(40), height: s(40) }}
@@ -126,7 +138,7 @@ const EmployeeScreen = () => {
           </>
         }
         renderItem={({ item }) => (
-          <TouchableOpacity 
+          <TouchableOpacity
             onLongPress={() => handleLongPress(item)}
             delayLongPress={500}
             activeOpacity={0.6}
