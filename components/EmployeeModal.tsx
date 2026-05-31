@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -38,10 +39,16 @@ const EmployeeModal = ({
   }, [initialData, isVisible]);
 
   const handleSave = () => {
-    if (!name || !employeeId) return;
+    if (!name.trim() || !employeeId.trim()) {
+      Alert.alert(
+        "Missing information",
+        "Please enter both a name and an employee ID."
+      );
+      return;
+    }
     onSave({
-      name,
-      employee_id: employeeId,
+      name: name.trim(),
+      employee_id: employeeId.trim(),
     });
     onClose();
   };

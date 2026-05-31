@@ -15,7 +15,7 @@ const QuickActionCard = ({ title, icon, onPress, backgroundColor }: QuickAction)
         height: s(100),
         padding: s(8),
         // Adding a subtle shadow for elevation
-        shadowColor: "#000",
+        shadowColor: theme.colors.shadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 8,
@@ -38,7 +38,7 @@ const QuickActionCard = ({ title, icon, onPress, backgroundColor }: QuickAction)
       </View>
       <Text 
         className="font-sans-semibold text-center text-primary"
-        style={{ fontSize: s(11), lineHeight: s(14) }}
+        style={{ fontSize: vs(11), lineHeight: vs(14) }}
       >
         {title}
       </Text>
