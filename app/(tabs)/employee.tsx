@@ -1,4 +1,5 @@
 import EmployeeCard from "@/components/EmployeeCard";
+import EmployeeModal from "@/components/EmployeeModal";
 import Searchbar from "@/components/ui/Searchbar";
 import { employees as initialEmployees } from "@/constant/data";
 import { icons } from "@/constant/icons";
@@ -20,6 +21,8 @@ const SafeAreaView = styled(RNSafeAreaView);
 const EmployeeScreen = () => {
   const [search, setSearch] = useState("");
   const [employeeList, setEmployeeList] = useState(initialEmployees);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
 
   const filteredEmployees = employeeList.filter(
     (emp) =>
@@ -27,19 +30,33 @@ const EmployeeScreen = () => {
       emp.employee_id.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const handleAddEmployee = () => {
-    // Basic implementation for now - in a real app this would open a form
-    const newId = (employeeList.length + 1).toString();
-    const newEmployee: Employee = {
-      id: newId,
-      employee_id: `EMP-00${newId}`,
-      name: `New Employee ${newId}`,
-      time_in: null,
-      time_out: null,
-      status: "Absent",
-    };
-    setEmployeeList([newEmployee, ...employeeList]);
-    Alert.alert("Success", "New employee added (Placeholder data)");
+  const handleOpenAddModal = () => {
+    setEditingEmployee(null);
+    setIsModalVisible(true);
+  };
+
+  const handleSaveEmployee = (data: Partial<Employee>) => {
+    if (editingEmployee) {
+      // Edit logic
+      setEmployeeList(
+        employeeList.map((emp) =>
+          emp.id === editingEmployee.id ? { ...emp, ...data } : emp,
+        ),
+      );
+      Alert.alert("Success", "Employee updated successfully");
+    } else {
+      // Add logic
+      const newEmployee: Employee = {
+        id: Date.now().toString(),
+        name: data.name!,
+        employee_id: data.employee_id!,
+        time_in: null,
+        time_out: null,
+        status: "Absent",
+      };
+      setEmployeeList([newEmployee, ...employeeList]);
+      Alert.alert("Success", "New employee added successfully");
+    }
   };
 
   const handleLongPress = (employee: Employee) => {
@@ -54,11 +71,8 @@ const EmployeeScreen = () => {
         {
           text: "Edit",
           onPress: () => {
-            // Placeholder for edit logic
-            Alert.alert(
-              "Edit",
-              `Editing ${employee.name} (Logic not implemented yet)`,
-            );
+            setEditingEmployee(employee);
+            setIsModalVisible(true);
           },
         },
         {
@@ -104,21 +118,18 @@ const EmployeeScreen = () => {
               className="flex-row items-center justify-between "
               style={{ marginBottom: vs(30) }}
             >
-              <View className="flex-row items-center gap-3">
-                <Text className="text-black font-sans-extrabold text-4xl">
-                  Employees
-                </Text>
-                <TouchableOpacity onPress={handleAddEmployee}>
-                  <Image
-                    source={icons.person} // Using person icon as a substitute for "add" icon if not available
-                    style={{ width: s(24), height: s(24), tintColor: "black" }}
-                  />
-                </TouchableOpacity>
-              </View>
-              <Image
-                source={icons.burger}
-                style={{ width: s(40), height: vs(40) }}
-              />
+              <Text className="text-black font-sans-extrabold text-4xl">
+                Employees
+              </Text>
+              <TouchableOpacity
+                onPress={handleOpenAddModal}
+                activeOpacity={0.7}
+              >
+                <Image
+                  source={icons.add}
+                  style={{ width: s(40), height: s(40) }}
+                />
+              </TouchableOpacity>
             </View>
 
             <View style={{ marginBottom: vs(20) }}>
@@ -141,6 +152,13 @@ const EmployeeScreen = () => {
             No employees found
           </Text>
         }
+      />
+
+      <EmployeeModal
+        isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onSave={handleSaveEmployee}
+        initialData={editingEmployee}
       />
     </SafeAreaView>
   );
