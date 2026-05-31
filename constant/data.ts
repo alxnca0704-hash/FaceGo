@@ -69,3 +69,21 @@ export const employees: Employee[] = [
     status: "Present",
   },
 ];
+
+export const QUICK_ACTIONS: QuickAction[] = [
+  {
+    id: "face-scan",
+    title: "Face Scan Attendance",
+    icon: icons.verified,
+  },
+  {
+    id: "download-records",
+    title: "Download Records",
+    icon: icons.record,
+  },
+  {
+    id: "add-employee",
+    title: "Add Employee",
+    icon: icons.person,
+  },
+];

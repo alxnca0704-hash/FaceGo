@@ -1,6 +1,7 @@
 import EmployeeCard from "@/components/EmployeeCard";
+import QuickActionCard from "@/components/QuickActionCard";
 import StatsCard from "@/components/StatsCard";
-import { employees, STATS } from "@/constant/data";
+import { employees, QUICK_ACTIONS, STATS } from "@/constant/data";
 import { icons } from "@/constant/icons";
 import { styled } from "nativewind";
 import React from "react";
@@ -12,7 +13,7 @@ const SafeAreaView = styled(RNSafeAreaView);
 
 const dashboard = () => {
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-background pb-1" edges={["top"]}>
       <FlatList
         data={employees.slice(0, 5)}
         keyExtractor={(item) => item.id}
@@ -38,7 +39,7 @@ const dashboard = () => {
             </View>
 
             {/* Stats Cards */}
-            <View className="mb-10">
+            <View className="mb-8">
               <FlatList
                 data={STATS}
                 renderItem={({ item }) => <StatsCard {...item} />}
@@ -51,6 +52,18 @@ const dashboard = () => {
                   </Text>
                 }
               />
+            </View>
+
+            {/* Quick Actions */}
+            <View className="mb-8">
+              <Text className="font-extrabold mb-4" style={{ fontSize: s(20) }}>
+                Quick Actions
+              </Text>
+              <View className="flex-row justify-between">
+                {QUICK_ACTIONS.map((action) => (
+                  <QuickActionCard key={action.id} {...action} />
+                ))}
+              </View>
             </View>
 
             {/* Recent Activity Header */}
