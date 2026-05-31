@@ -5,7 +5,7 @@ import home from "@/assets/icons/home.png";
 import person from "@/assets/icons/person.png";
 import record from "@/assets/icons/record.png";
 import verified from "@/assets/icons/verified.png";
-
+import add from "@/assets/icons/add.png";
 export const icons = {
   home,
   employee,
@@ -14,6 +14,7 @@ export const icons = {
   person,
   verified,
   record,
+  add
 } as const;
 
 export type IconKey = keyof typeof icons;

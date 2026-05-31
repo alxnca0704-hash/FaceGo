@@ -27,6 +27,14 @@ declare global {
     time_out: string | null;
     status: "Present" | "Absent";
   }
+
+  interface QuickAction {
+    id: string;
+    title: string;
+    icon: ImageSourcePropType;
+    onPress?: () => void;
+    backgroundColor?: string;
+  }
 }
 
 export { };
