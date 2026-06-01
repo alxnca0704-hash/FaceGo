@@ -33,8 +33,8 @@ export const useEmployees = () => {
 
   const handleSaveEmployee = (data: Partial<Employee>) => {
     if (editingEmployee) {
-      setEmployeeList(
-        employeeList.map((emp) =>
+      setEmployeeList((prev) =>
+        prev.map((emp) =>
           emp.id === editingEmployee.id ? { ...emp, ...data } : emp
         )
       );
@@ -49,7 +49,7 @@ export const useEmployees = () => {
         time_out: null,
         status: "Inactive",
       };
-      setEmployeeList([newEmployee, ...employeeList]);
+      setEmployeeList((prev) => [newEmployee, ...prev]);
       Alert.alert("Success", "New employee added successfully");
     }
   };

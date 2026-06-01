@@ -26,6 +26,7 @@ const EmployeeCard = ({
         </Text>
         <Text
           className={cn(
+            "font-sans-medium",
             status === "Present"
               ? "text-green-700"
               : status === "Absent"
@@ -45,18 +46,30 @@ const EmployeeCard = ({
         </Text>
       </View>
       <View className="flex-row justify-between mb-1">
-        <Text style={{ color: theme.colors.mutedForeground }}>
+        <Text
+          className="font-sans-regular"
+          style={{ color: theme.colors.mutedForeground }}
+        >
           {employee_id}
         </Text>
-        <Text style={{ color: theme.colors.mutedForeground }}>
+        <Text
+          className="font-sans-regular"
+          style={{ color: theme.colors.mutedForeground }}
+        >
           {department}
         </Text>
       </View>
       <View className="flex-row justify-start gap-10">
-        <Text style={{ color: theme.colors.primary }}>
+        <Text
+          className="font-sans-medium"
+          style={{ color: theme.colors.primary }}
+        >
           Time in: {time_in ?? "N/A"}
         </Text>
-        <Text style={{ color: theme.colors.primary }}>
+        <Text
+          className="font-sans-medium"
+          style={{ color: theme.colors.primary }}
+        >
           Time out: {time_out ?? "N/A"}
         </Text>
       </View>
