@@ -1,9 +1,9 @@
 import AttendanceLogItem from "@/components/AttendanceLogItem";
 import Searchbar from "@/components/ui/Searchbar";
-import { employees } from "@/constant/data";
 import { images } from "@/constant/images";
+import { useAttendance } from "@/lib/hooks/useAttendance";
 import { styled } from "nativewind";
-import React, { useState } from "react";
+import React from "react";
 import { FlatList, Image, Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { s, vs } from "react-native-size-matters";
@@ -11,13 +11,7 @@ import { s, vs } from "react-native-size-matters";
 const SafeAreaView = styled(RNSafeAreaView);
 
 const Attendance = () => {
-  const [search, setSearch] = useState("");
-
-  const filteredEmployees = employees.filter(
-    (emp) =>
-      emp.name.toLowerCase().includes(search.toLowerCase()) ||
-      emp.employee_id.toLowerCase().includes(search.toLowerCase())
-  );
+  const { search, setSearch, filteredEmployees } = useAttendance();
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>

@@ -99,7 +99,6 @@ const ScanningScreen = () => {
           <TouchableOpacity
             className="bg-black py-4 rounded-3xl items-center shadow-lg"
             activeOpacity={0.8}
-            style={{ backgroundColor: theme.colors.primary }}
           >
             <Text className="text-white font-sans-bold text-lg">
               Start Scanning

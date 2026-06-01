@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -10,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { vs } from "react-native-size-matters";
+import { useEmployeeForm } from "@/lib/hooks/useEmployeeForm";
 import { Input } from "./ui/input";
 
 interface EmployeeModalProps {
@@ -25,33 +25,15 @@ const EmployeeModal = ({
   onSave,
   initialData,
 }: EmployeeModalProps) => {
-  const [name, setName] = useState("");
-  const [employeeId, setEmployeeId] = useState("");
-
-  useEffect(() => {
-    if (initialData) {
-      setName(initialData.name);
-      setEmployeeId(initialData.employee_id);
-    } else {
-      setName("");
-      setEmployeeId("");
-    }
-  }, [initialData, isVisible]);
-
-  const handleSave = () => {
-    if (!name.trim() || !employeeId.trim()) {
-      Alert.alert(
-        "Missing information",
-        "Please enter both a name and an employee ID."
-      );
-      return;
-    }
-    onSave({
-      name: name.trim(),
-      employee_id: employeeId.trim(),
-    });
-    onClose();
-  };
+  const {
+    name,
+    setName,
+    employeeId,
+    setEmployeeId,
+    department,
+    setDepartment,
+    handleSave,
+  } = useEmployeeForm({ initialData, isVisible, onSave, onClose });
 
   return (
     <Modal
@@ -100,7 +82,7 @@ const EmployeeModal = ({
                   />
                 </View>
 
-                <View className="mb-8">
+                <View className="mb-4">
                   <Text className="font-sans-semibold mb-2 text-gray-700">
                     Employee ID
                   </Text>
@@ -108,6 +90,18 @@ const EmployeeModal = ({
                     value={employeeId}
                     onChangeText={setEmployeeId}
                     placeholder="e.g. EMP-001"
+                    className="bg-white border-gray-200 h-12 rounded-xl"
+                  />
+                </View>
+
+                <View className="mb-8">
+                  <Text className="font-sans-semibold mb-2 text-gray-700">
+                    Department
+                  </Text>
+                  <Input
+                    value={department}
+                    onChangeText={setDepartment}
+                    placeholder="e.g. Engineering"
                     className="bg-white border-gray-200 h-12 rounded-xl"
                   />
                 </View>

@@ -23,9 +23,10 @@ declare global {
     id: string;
     employee_id: string;
     name: string;
+    department: string;
     time_in: string | null;
     time_out: string | null;
-    status: "Present" | "Absent";
+    status: "Present" | "Absent" | "Inactive";
     date?: string;
   }
 

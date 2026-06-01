@@ -1,56 +1,56 @@
-import { cn } from '@/lib/utils'
-import { Ionicons } from '@expo/vector-icons'
-import { router } from 'expo-router'
-import React, { useState } from 'react'
+import { cn } from "@/lib/utils";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import React, { useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View
-} from 'react-native'
-import { s, vs } from 'react-native-size-matters'
+  Alert,
+  ScrollView,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { s, vs } from "react-native-size-matters";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ToggleItemProps {
-  icon: keyof typeof Ionicons.glyphMap
-  label: string
-  description?: string
-  value: boolean
-  onValueChange: (v: boolean) => void
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  description?: string;
+  value: boolean;
+  onValueChange: (v: boolean) => void;
 }
 
 interface NavItemProps {
-  icon: keyof typeof Ionicons.glyphMap
-  label: string
-  description?: string
-  trailing?: string
-  danger?: boolean
-  onPress?: () => void
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  description?: string;
+  trailing?: string;
+  danger?: boolean;
+  onPress?: () => void;
 }
 
 interface SectionHeaderProps {
-  title: string
+  title: string;
 }
 
 // ─── Theme (mirrors constant/theme.ts conventions) ────────────────────────────
 
 const COLORS = {
-  primary: '#3B82F6',       // brand blue
-  primaryLight: '#EFF6FF',
-  surface: '#FFFFFF',
-  background: '#F5F7FA',
-  border: '#E5E7EB',
-  textPrimary: '#111827',
-  textSecondary: '#6B7280',
-  textMuted: '#9CA3AF',
-  danger: '#EF4444',
-  dangerLight: '#FEF2F2',
-  success: '#10B981',
-  warning: '#F59E0B',
-}
+  primary: "#3B82F6", // brand blue
+  primaryLight: "#EFF6FF",
+  surface: "#FFFFFF",
+  background: "#F5F7FA",
+  border: "#E5E7EB",
+  textPrimary: "#111827",
+  textSecondary: "#6B7280",
+  textMuted: "#9CA3AF",
+  danger: "#EF4444",
+  dangerLight: "#FEF2F2",
+  success: "#10B981",
+  warning: "#F59E0B",
+};
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -63,7 +63,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ title }) => (
       {title}
     </Text>
   </View>
-)
+);
 
 const ToggleItem: React.FC<ToggleItemProps> = ({
   icon,
@@ -72,9 +72,7 @@ const ToggleItem: React.FC<ToggleItemProps> = ({
   value,
   onValueChange,
 }) => (
-  <View
-    className="flex-row items-center justify-between px-5 py-3 bg-white border-b border-gray-100"
-  >
+  <View className="flex-row items-center justify-between px-5 py-3 bg-white border-b border-gray-100">
     <View className="flex-row items-center flex-1 gap-3">
       <View
         className="w-9 h-9 rounded-xl items-center justify-center"
@@ -107,7 +105,7 @@ const ToggleItem: React.FC<ToggleItemProps> = ({
       ios_backgroundColor={COLORS.border}
     />
   </View>
-)
+);
 
 const NavItem: React.FC<NavItemProps> = ({
   icon,
@@ -137,7 +135,10 @@ const NavItem: React.FC<NavItemProps> = ({
       </View>
       <View className="flex-1">
         <Text
-          className={cn('font-sans-medium', danger ? 'text-red-500' : 'text-gray-900')}
+          className={cn(
+            "font-sans-medium",
+            danger ? "text-red-500" : "text-gray-900",
+          )}
           style={{ fontSize: vs(13) }}
         >
           {label}
@@ -168,49 +169,52 @@ const NavItem: React.FC<NavItemProps> = ({
       />
     </View>
   </TouchableOpacity>
-)
+);
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
 const SettingsScreen: React.FC = () => {
-  const [notifications, setNotifications] = useState(true)
-  const [emailNotifications, setEmailNotifications] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
-  const [biometrics, setBiometrics] = useState(true)
-  const [autoSync, setAutoSync] = useState(true)
+  const [notifications, setNotifications] = useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [biometrics, setBiometrics] = useState(true);
+  const [autoSync, setAutoSync] = useState(true);
 
   const handleLogout = () => {
-    Alert.alert('Log out', 'Are you sure you want to log out?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert("Log out", "Are you sure you want to log out?", [
+      { text: "Cancel", style: "cancel" },
       {
-        text: 'Log out',
-        style: 'destructive',
-        onPress: () => router.replace('/'),
+        text: "Log out",
+        style: "destructive",
+        onPress: () => router.replace("/"),
       },
-    ])
-  }
+    ]);
+  };
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Delete account',
-      'This action is permanent and cannot be undone. All your data will be erased.',
+      "Delete account",
+      "This action is permanent and cannot be undone. All your data will be erased.",
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => console.log('Account deleted') },
-      ]
-    )
-  }
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => console.log("Account deleted"),
+        },
+      ],
+    );
+  };
 
   const handleClearCache = () => {
-    Alert.alert('Clear cache', 'This will remove all temporary files.', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Clear', onPress: () => console.log('Cache cleared') },
-    ])
-  }
+    Alert.alert("Clear cache", "This will remove all temporary files.", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Clear", onPress: () => console.log("Cache cleared") },
+    ]);
+  };
 
   return (
     <View className="flex-1" style={{ backgroundColor: COLORS.background }}>
-
       {/* ── Header ── */}
       <View
         className="bg-white border-b border-gray-100 px-5 pb-4"
@@ -231,7 +235,6 @@ const SettingsScreen: React.FC = () => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-
         {/* ── Profile Card ── */}
         <View className="mx-4 mt-5 mb-1">
           <TouchableOpacity
@@ -240,7 +243,7 @@ const SettingsScreen: React.FC = () => {
             style={{
               borderWidth: 0.5,
               borderColor: COLORS.border,
-              shadowColor: '#000',
+              shadowColor: "#000",
               shadowOffset: { width: 0, height: 1 },
               shadowOpacity: 0.04,
               shadowRadius: 4,
@@ -287,13 +290,20 @@ const SettingsScreen: React.FC = () => {
               </View>
             </View>
 
-            <Ionicons name="chevron-forward" size={s(18)} color={COLORS.textMuted} />
+            <Ionicons
+              name="chevron-forward"
+              size={s(18)}
+              color={COLORS.textMuted}
+            />
           </TouchableOpacity>
         </View>
 
         {/* ── Notifications ── */}
         <SectionHeader title="Notifications" />
-        <View className="mx-4 rounded-2xl overflow-hidden" style={{ borderWidth: 0.5, borderColor: COLORS.border }}>
+        <View
+          className="mx-4 rounded-2xl overflow-hidden"
+          style={{ borderWidth: 0.5, borderColor: COLORS.border }}
+        >
           <ToggleItem
             icon="notifications-outline"
             label="Push notifications"
@@ -312,7 +322,10 @@ const SettingsScreen: React.FC = () => {
 
         {/* ── Appearance ── */}
         <SectionHeader title="Appearance" />
-        <View className="mx-4 rounded-2xl overflow-hidden" style={{ borderWidth: 0.5, borderColor: COLORS.border }}>
+        <View
+          className="mx-4 rounded-2xl overflow-hidden"
+          style={{ borderWidth: 0.5, borderColor: COLORS.border }}
+        >
           <ToggleItem
             icon="moon-outline"
             label="Dark mode"
@@ -328,7 +341,10 @@ const SettingsScreen: React.FC = () => {
 
         {/* ── Security ── */}
         <SectionHeader title="Security" />
-        <View className="mx-4 rounded-2xl overflow-hidden" style={{ borderWidth: 0.5, borderColor: COLORS.border }}>
+        <View
+          className="mx-4 rounded-2xl overflow-hidden"
+          style={{ borderWidth: 0.5, borderColor: COLORS.border }}
+        >
           <ToggleItem
             icon="finger-print-outline"
             label="Biometric login"
@@ -336,10 +352,7 @@ const SettingsScreen: React.FC = () => {
             value={biometrics}
             onValueChange={setBiometrics}
           />
-          <NavItem
-            icon="lock-closed-outline"
-            label="Change password"
-          />
+          <NavItem icon="lock-closed-outline" label="Change password" />
           <NavItem
             icon="shield-checkmark-outline"
             label="Two-factor authentication"
@@ -349,7 +362,10 @@ const SettingsScreen: React.FC = () => {
 
         {/* ── Data & Sync ── */}
         <SectionHeader title="Data & Sync" />
-        <View className="mx-4 rounded-2xl overflow-hidden" style={{ borderWidth: 0.5, borderColor: COLORS.border }}>
+        <View
+          className="mx-4 rounded-2xl overflow-hidden"
+          style={{ borderWidth: 0.5, borderColor: COLORS.border }}
+        >
           <ToggleItem
             icon="sync-outline"
             label="Auto sync"
@@ -372,29 +388,26 @@ const SettingsScreen: React.FC = () => {
 
         {/* ── About ── */}
         <SectionHeader title="About" />
-        <View className="mx-4 rounded-2xl overflow-hidden" style={{ borderWidth: 0.5, borderColor: COLORS.border }}>
+        <View
+          className="mx-4 rounded-2xl overflow-hidden"
+          style={{ borderWidth: 0.5, borderColor: COLORS.border }}
+        >
           <NavItem
             icon="information-circle-outline"
             label="App version"
             trailing="v1.0.0"
           />
-          <NavItem
-            icon="document-text-outline"
-            label="Terms of service"
-          />
-          <NavItem
-            icon="shield-outline"
-            label="Privacy policy"
-          />
-          <NavItem
-            icon="help-circle-outline"
-            label="Help & support"
-          />
+          <NavItem icon="document-text-outline" label="Terms of service" />
+          <NavItem icon="shield-outline" label="Privacy policy" />
+          <NavItem icon="help-circle-outline" label="Help & support" />
         </View>
 
         {/* ── Danger Zone ── */}
         <SectionHeader title="Account" />
-        <View className="mx-4 rounded-2xl overflow-hidden" style={{ borderWidth: 0.5, borderColor: COLORS.border }}>
+        <View
+          className="mx-4 rounded-2xl overflow-hidden"
+          style={{ borderWidth: 0.5, borderColor: COLORS.border }}
+        >
           <NavItem
             icon="log-out-outline"
             label="Log out"
@@ -413,7 +426,7 @@ const SettingsScreen: React.FC = () => {
         <View style={{ height: vs(40) }} />
       </ScrollView>
     </View>
-  )
-}
+  );
+};
 
-export default SettingsScreen
+export default SettingsScreen;
