@@ -1,5 +1,4 @@
 import { icons } from "@/constant/icons";
-import { theme } from "@/constant/theme";
 import { useRouter } from "expo-router";
 import { styled } from "nativewind";
 import React from "react";
@@ -23,11 +22,7 @@ const ScanningScreen = () => {
           >
             <Image
               source={icons.home}
-              style={{
-                width: s(20),
-                height: s(20),
-                tintColor: theme.colors.primary,
-              }}
+              style={{ width: s(20), height: s(20), tintColor: "black" }}
             />
           </TouchableOpacity>
           <Text className="text-black font-sans-bold text-lg">Face Scan</Text>
@@ -41,35 +36,15 @@ const ScanningScreen = () => {
             style={{ width: s(260), height: s(320) }}
           >
             {/* Corner Markers */}
-            <View
-              className="absolute -top-1 -left-1 w-12 h-12 border-t-4 border-l-4 rounded-tl-3xl"
-              style={{ borderColor: theme.colors.accent }}
-            />
-            <View
-              className="absolute -top-1 -right-1 w-12 h-12 border-t-4 border-r-4 rounded-tr-3xl"
-              style={{ borderColor: theme.colors.accent }}
-            />
-            <View
-              className="absolute -bottom-1 -left-1 w-12 h-12 border-b-4 border-l-4 rounded-bl-3xl"
-              style={{ borderColor: theme.colors.accent }}
-            />
-            <View
-              className="absolute -bottom-1 -right-1 w-12 h-12 border-b-4 border-r-4 rounded-br-3xl"
-              style={{ borderColor: theme.colors.accent }}
-            />
+            <View className="absolute -top-1 -left-1 w-12 h-12 border-t-4 border-l-4 border-orange-500 rounded-tl-3xl" />
+            <View className="absolute -top-1 -right-1 w-12 h-12 border-t-4 border-r-4 border-orange-500 rounded-tr-3xl" />
+            <View className="absolute -bottom-1 -left-1 w-12 h-12 border-b-4 border-l-4 border-orange-500 rounded-bl-3xl" />
+            <View className="absolute -bottom-1 -right-1 w-12 h-12 border-b-4 border-r-4 border-orange-500 rounded-br-3xl" />
 
             {/* Scanning Line Animation Mockup */}
             <View
-              className="absolute w-full h-[2px]"
-              style={{
-                top: "30%",
-                backgroundColor: theme.colors.accent,
-                shadowColor: theme.colors.accent,
-                shadowOffset: { width: 0, height: 0 },
-                shadowOpacity: 0.8,
-                shadowRadius: 15,
-                elevation: 5,
-              }}
+              className="absolute w-full h-[2px] bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.8)]"
+              style={{ top: "30%" }}
             />
 
             <Image
@@ -78,7 +53,7 @@ const ScanningScreen = () => {
                 width: s(120),
                 height: s(120),
                 opacity: 0.1,
-                tintColor: theme.colors.primary,
+                tintColor: "black",
               }}
             />
           </View>
@@ -99,7 +74,6 @@ const ScanningScreen = () => {
           <TouchableOpacity
             className="bg-black py-4 rounded-3xl items-center shadow-lg"
             activeOpacity={0.8}
-            style={{ backgroundColor: theme.colors.primary }}
           >
             <Text className="text-white font-sans-bold text-lg">
               Start Scanning

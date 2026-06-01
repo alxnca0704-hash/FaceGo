@@ -41,7 +41,10 @@ const DownloadRecordsScreen = () => {
       </View>
 
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: s(24), paddingBottom: vs(40) }}
+        contentContainerStyle={{
+          paddingHorizontal: s(24),
+          paddingBottom: vs(40),
+        }}
       >
         {/* Date Range Selection */}
         <View className="mb-8">
@@ -57,13 +60,13 @@ const DownloadRecordsScreen = () => {
                   "px-6 py-3 rounded-2xl border",
                   selectedRange === range
                     ? "bg-black border-black"
-                    : "bg-white border-gray-100"
+                    : "bg-white border-gray-100",
                 )}
               >
                 <Text
                   className={cn(
                     "font-sans-semibold",
-                    selectedRange === range ? "text-white" : "text-gray-500"
+                    selectedRange === range ? "text-white" : "text-gray-500",
                   )}
                 >
                   {range}
@@ -87,13 +90,13 @@ const DownloadRecordsScreen = () => {
                   "flex-1 items-center py-5 rounded-3xl border",
                   selectedFormat === format
                     ? "bg-black border-black"
-                    : "bg-white border-gray-100"
+                    : "bg-white border-gray-100",
                 )}
               >
                 <View
                   className={cn(
                     "w-12 h-12 rounded-2xl items-center justify-center mb-2",
-                    selectedFormat === format ? "bg-white/20" : "bg-gray-50"
+                    selectedFormat === format ? "bg-white/20" : "bg-gray-50",
                   )}
                 >
                   <Image
@@ -111,7 +114,7 @@ const DownloadRecordsScreen = () => {
                 <Text
                   className={cn(
                     "font-sans-bold",
-                    selectedFormat === format ? "text-white" : "text-gray-900"
+                    selectedFormat === format ? "text-white" : "text-gray-900",
                   )}
                 >
                   {format}
