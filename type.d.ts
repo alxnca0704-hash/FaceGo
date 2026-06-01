@@ -26,6 +26,7 @@ declare global {
     time_in: string | null;
     time_out: string | null;
     status: "Present" | "Absent";
+    date?: string;
   }
 
   interface QuickAction {
