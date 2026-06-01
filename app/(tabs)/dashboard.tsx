@@ -53,10 +53,12 @@ const Dashboard = () => {
                   Dashboard
                 </Text>
               </View>
-              <Image
+<TouchableOpacity onPress={() => {router.push("/settings")}}>
+                <Image
                 source={icons.burger}
                 style={{ width: s(40), height: vs(40) }}
               />
+</TouchableOpacity>
             </View>
 
             {/* Stats Cards */}
