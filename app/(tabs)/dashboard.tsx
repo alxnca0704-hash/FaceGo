@@ -4,6 +4,7 @@ import StatsCard from "@/components/StatsCard";
 import { employees, QUICK_ACTIONS, STATS } from "@/constant/data";
 import { icons } from "@/constant/icons";
 import { images } from "@/constant/images";
+import { useRouter } from "expo-router";
 import { styled } from "nativewind";
 import React from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
@@ -13,6 +14,18 @@ import { s, vs } from "react-native-size-matters";
 const SafeAreaView = styled(RNSafeAreaView);
 
 const dashboard = () => {
+  const router = useRouter();
+
+  const handleQuickAction = (id: string) => {
+    if (id === "face-scan") {
+      router.push("/scanning");
+    } else if (id === "download-records") {
+      router.push("/download-records");
+    } else if (id === "add-employee") {
+      router.push("/(tabs)/employee");
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background pb-1" edges={["top"]}>
       <FlatList
@@ -69,7 +82,11 @@ const dashboard = () => {
               </Text>
               <View className="flex-row justify-between">
                 {QUICK_ACTIONS.map((action) => (
-                  <QuickActionCard key={action.id} {...action} />
+                  <QuickActionCard
+                    key={action.id}
+                    {...action}
+                    onPress={() => handleQuickAction(action.id)}
+                  />
                 ))}
               </View>
             </View>
