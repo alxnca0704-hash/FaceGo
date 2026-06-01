@@ -13,7 +13,7 @@ import { s, vs } from "react-native-size-matters";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
-const dashboard = () => {
+const Dashboard = () => {
   const router = useRouter();
 
   const handleQuickAction = (id: string) => {
@@ -129,4 +129,4 @@ const dashboard = () => {
   );
 };
 
-export default dashboard;
+export default Dashboard;
