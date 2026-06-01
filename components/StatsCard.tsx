@@ -1,10 +1,13 @@
+import { theme } from "@/constant/theme";
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { s, vs } from "react-native-size-matters";
 
 const StatsCard = ({ icon, name, total }: Stats) => {
   return (
-    <View style={style.card} className="bg-black">
+    <View
+      style={[style.card, { backgroundColor: theme.colors.primary }]}
+    >
       <Image source={icon} style={style.icon} />
       <Text
         className="text-white font-sans-extrabold"
@@ -31,7 +34,7 @@ const style = StyleSheet.create({
     paddingLeft: s(20),
     marginRight: s(15),
     alignItems: "flex-start",
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 12,

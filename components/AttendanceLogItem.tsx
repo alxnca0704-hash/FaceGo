@@ -1,5 +1,6 @@
 import { icons } from "@/constant/icons";
-import clsx from "clsx";
+import { theme } from "@/constant/theme";
+import { cn } from "@/lib/utils";
 import React from "react";
 import { Image, Text, View } from "react-native";
 import { s, vs } from "react-native-size-matters";
@@ -22,7 +23,7 @@ const AttendanceLogItem = ({
       {/* Timeline Left */}
       <View className="items-center" style={{ width: s(40) }}>
         <View
-          className={clsx(
+          className={cn(
             "w-3 h-3 rounded-full z-10",
             status === "Present" ? "bg-green-500" : "bg-red-400"
           )}
@@ -47,13 +48,13 @@ const AttendanceLogItem = ({
               {date ?? "Today"}
             </Text>
             <View
-              className={clsx(
+              className={cn(
                 "px-3 py-1 rounded-full",
                 status === "Present" ? "bg-green-100" : "bg-red-100"
               )}
             >
               <Text
-                className={clsx(
+                className={cn(
                   "font-sans-semibold",
                   status === "Present" ? "text-green-700" : "text-red-700"
                 )}
@@ -79,7 +80,11 @@ const AttendanceLogItem = ({
               <View className="bg-green-100 p-2 rounded-xl">
                 <Image
                   source={icons.record}
-                  style={{ width: s(14), height: s(14), tintColor: "#15803d" }}
+                  style={{
+                    width: s(14),
+                    height: s(14),
+                    tintColor: theme.colors.success,
+                  }}
                 />
               </View>
               <View>
@@ -101,7 +106,11 @@ const AttendanceLogItem = ({
               <View className="bg-orange-100 p-2 rounded-xl">
                 <Image
                   source={icons.record}
-                  style={{ width: s(14), height: s(14), tintColor: "#c2410c" }}
+                  style={{
+                    width: s(14),
+                    height: s(14),
+                    tintColor: theme.colors.accent,
+                  }}
                 />
               </View>
               <View>
