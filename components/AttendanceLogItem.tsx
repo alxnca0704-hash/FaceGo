@@ -12,6 +12,7 @@ interface AttendanceLogItemProps extends Employee {
 const AttendanceLogItem = ({
   name,
   employee_id,
+  department,
   time_in,
   time_out,
   status,
@@ -25,7 +26,11 @@ const AttendanceLogItem = ({
         <View
           className={cn(
             "w-3 h-3 rounded-full z-10",
-            status === "Present" ? "bg-green-500" : "bg-red-400"
+            status === "Present"
+              ? "bg-green-500"
+              : status === "Absent"
+              ? "bg-red-400"
+              : "bg-gray-300"
           )}
           style={{ marginTop: vs(8) }}
         />
@@ -50,13 +55,21 @@ const AttendanceLogItem = ({
             <View
               className={cn(
                 "px-3 py-1 rounded-full",
-                status === "Present" ? "bg-green-100" : "bg-red-100"
+                status === "Present"
+                  ? "bg-green-100"
+                  : status === "Absent"
+                  ? "bg-red-100"
+                  : "bg-gray-100"
               )}
             >
               <Text
                 className={cn(
                   "font-sans-semibold",
-                  status === "Present" ? "text-green-700" : "text-red-700"
+                  status === "Present"
+                    ? "text-green-700"
+                    : status === "Absent"
+                    ? "text-red-700"
+                    : "text-gray-500"
                 )}
                 style={{ fontSize: vs(10) }}
               >
@@ -68,12 +81,20 @@ const AttendanceLogItem = ({
           <Text className="font-sans-extrabold text-xl mb-1 text-primary">
             {name}
           </Text>
-          <Text
-            className="font-sans-medium text-gray-500 mb-4"
-            style={{ fontSize: vs(11) }}
-          >
-            {employee_id}
-          </Text>
+          <View className="flex-row justify-between mb-4">
+            <Text
+              className="font-sans-medium text-gray-500"
+              style={{ fontSize: vs(11) }}
+            >
+              {employee_id}
+            </Text>
+            <Text
+              className="font-sans-medium text-gray-500"
+              style={{ fontSize: vs(11) }}
+            >
+              {department}
+            </Text>
+          </View>
 
           <View className="flex-row items-center justify-between bg-gray-50 p-4 rounded-2xl">
             <View className="flex-row items-center" style={{ gap: s(10) }}>

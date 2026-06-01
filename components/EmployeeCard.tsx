@@ -7,6 +7,7 @@ import { vs } from "react-native-size-matters";
 const EmployeeCard = ({
   name,
   employee_id,
+  department,
   time_in,
   time_out,
   status,
@@ -25,24 +26,32 @@ const EmployeeCard = ({
         </Text>
         <Text
           className={cn(
-            status === "Present" ? "text-green-700" : "text-red-700"
+            status === "Present"
+              ? "text-green-700"
+              : status === "Absent"
+              ? "text-red-700"
+              : "text-gray-500"
           )}
           style={{
             color:
               status === "Present"
                 ? theme.colors.success
-                : theme.colors.destructive,
+                : status === "Absent"
+                ? theme.colors.destructive
+                : theme.colors.mutedForeground,
           }}
         >
           {status}
         </Text>
       </View>
-      <Text
-        className="mb-1"
-        style={{ color: theme.colors.mutedForeground }}
-      >
-        {employee_id}
-      </Text>
+      <View className="flex-row justify-between mb-1">
+        <Text style={{ color: theme.colors.mutedForeground }}>
+          {employee_id}
+        </Text>
+        <Text style={{ color: theme.colors.mutedForeground }}>
+          {department}
+        </Text>
+      </View>
       <View className="flex-row justify-start gap-10">
         <Text style={{ color: theme.colors.primary }}>
           Time in: {time_in ?? "N/A"}

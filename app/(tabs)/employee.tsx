@@ -27,7 +27,8 @@ const EmployeeScreen = () => {
   const filteredEmployees = employeeList.filter(
     (emp) =>
       emp.name.toLowerCase().includes(search.toLowerCase()) ||
-      emp.employee_id.toLowerCase().includes(search.toLowerCase()),
+      emp.employee_id.toLowerCase().includes(search.toLowerCase()) ||
+      emp.department.toLowerCase().includes(search.toLowerCase()),
   );
 
   const handleOpenAddModal = () => {
@@ -50,9 +51,10 @@ const EmployeeScreen = () => {
         id: Date.now().toString(),
         name: data.name!,
         employee_id: data.employee_id!,
+        department: data.department!,
         time_in: null,
         time_out: null,
-        status: "Absent",
+        status: "Inactive",
       };
       setEmployeeList([newEmployee, ...employeeList]);
       Alert.alert("Success", "New employee added successfully");

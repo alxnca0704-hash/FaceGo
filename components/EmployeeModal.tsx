@@ -27,28 +27,32 @@ const EmployeeModal = ({
 }: EmployeeModalProps) => {
   const [name, setName] = useState("");
   const [employeeId, setEmployeeId] = useState("");
+  const [department, setDepartment] = useState("");
 
   useEffect(() => {
     if (initialData) {
       setName(initialData.name);
       setEmployeeId(initialData.employee_id);
+      setDepartment(initialData.department);
     } else {
       setName("");
       setEmployeeId("");
+      setDepartment("");
     }
   }, [initialData, isVisible]);
 
   const handleSave = () => {
-    if (!name.trim() || !employeeId.trim()) {
+    if (!name.trim() || !employeeId.trim() || !department.trim()) {
       Alert.alert(
         "Missing information",
-        "Please enter both a name and an employee ID."
+        "Please enter a name, employee ID, and department."
       );
       return;
     }
     onSave({
       name: name.trim(),
       employee_id: employeeId.trim(),
+      department: department.trim(),
     });
     onClose();
   };
@@ -100,7 +104,7 @@ const EmployeeModal = ({
                   />
                 </View>
 
-                <View className="mb-8">
+                <View className="mb-4">
                   <Text className="font-sans-semibold mb-2 text-gray-700">
                     Employee ID
                   </Text>
@@ -108,6 +112,18 @@ const EmployeeModal = ({
                     value={employeeId}
                     onChangeText={setEmployeeId}
                     placeholder="e.g. EMP-001"
+                    className="bg-white border-gray-200 h-12 rounded-xl"
+                  />
+                </View>
+
+                <View className="mb-8">
+                  <Text className="font-sans-semibold mb-2 text-gray-700">
+                    Department
+                  </Text>
+                  <Input
+                    value={department}
+                    onChangeText={setDepartment}
+                    placeholder="e.g. Engineering"
                     className="bg-white border-gray-200 h-12 rounded-xl"
                   />
                 </View>
