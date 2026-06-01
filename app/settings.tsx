@@ -237,6 +237,7 @@ const SettingsScreen: React.FC = () => {
           <TouchableOpacity
             activeOpacity={0.8}
             className="bg-white rounded-2xl p-4 flex-row items-center gap-4"
+            onPress={() => router.push('/profile')}
             style={{
               borderWidth: 0.5,
               borderColor: COLORS.border,
@@ -336,10 +337,11 @@ const SettingsScreen: React.FC = () => {
             value={biometrics}
             onValueChange={setBiometrics}
           />
-          <NavItem
-            icon="lock-closed-outline"
-            label="Change password"
-          />
+<NavItem
+             icon="lock-closed-outline"
+             label="Change PIN"
+             onPress={() => router.push('/change-pin')}
+           />
           <NavItem
             icon="shield-checkmark-outline"
             label="Two-factor authentication"
