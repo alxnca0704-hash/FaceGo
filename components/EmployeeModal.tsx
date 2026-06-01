@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -10,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { vs } from "react-native-size-matters";
+import { useEmployeeForm } from "@/lib/hooks/useEmployeeForm";
 import { Input } from "./ui/input";
 
 interface EmployeeModalProps {
@@ -25,37 +25,15 @@ const EmployeeModal = ({
   onSave,
   initialData,
 }: EmployeeModalProps) => {
-  const [name, setName] = useState("");
-  const [employeeId, setEmployeeId] = useState("");
-  const [department, setDepartment] = useState("");
-
-  useEffect(() => {
-    if (initialData) {
-      setName(initialData.name);
-      setEmployeeId(initialData.employee_id);
-      setDepartment(initialData.department);
-    } else {
-      setName("");
-      setEmployeeId("");
-      setDepartment("");
-    }
-  }, [initialData, isVisible]);
-
-  const handleSave = () => {
-    if (!name.trim() || !employeeId.trim() || !department.trim()) {
-      Alert.alert(
-        "Missing information",
-        "Please enter a name, employee ID, and department."
-      );
-      return;
-    }
-    onSave({
-      name: name.trim(),
-      employee_id: employeeId.trim(),
-      department: department.trim(),
-    });
-    onClose();
-  };
+  const {
+    name,
+    setName,
+    employeeId,
+    setEmployeeId,
+    department,
+    setDepartment,
+    handleSave,
+  } = useEmployeeForm({ initialData, isVisible, onSave, onClose });
 
   return (
     <Modal
