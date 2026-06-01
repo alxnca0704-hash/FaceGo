@@ -35,6 +35,7 @@ export const employees: Employee[] = [
     time_in: "08:02 AM",
     time_out: "05:10 PM",
     status: "Present",
+    date: "June 1, 2026",
   },
   {
     id: "2",
@@ -43,6 +44,7 @@ export const employees: Employee[] = [
     time_in: null,
     time_out: null,
     status: "Absent",
+    date: "June 1, 2026",
   },
   {
     id: "3",
@@ -51,6 +53,7 @@ export const employees: Employee[] = [
     time_in: "08:45 AM",
     time_out: "05:00 PM",
     status: "Present",
+    date: "June 1, 2026",
   },
   {
     id: "4",
@@ -59,6 +62,7 @@ export const employees: Employee[] = [
     time_in: null,
     time_out: null,
     status: "Absent",
+    date: "May 31, 2026",
   },
   {
     id: "5",
@@ -67,6 +71,7 @@ export const employees: Employee[] = [
     time_in: "07:58 AM",
     time_out: "04:55 PM",
     status: "Present",
+    date: "May 31, 2026",
   },
 ];
 
