@@ -58,6 +58,7 @@ const Dashboard = () => {
                 source={icons.burger}
                 style={{ width: s(40), height: vs(40) }}
               />
+
 </TouchableOpacity>
             </View>
 
@@ -100,7 +101,6 @@ const Dashboard = () => {
               </Text>
               <TouchableOpacity
                 className="bg-black justify-between items-center"
-                onPress={() => router.push("/(tabs)/employee")}
                 style={{
                   paddingVertical: vs(5),
                   paddingHorizontal: s(15),
