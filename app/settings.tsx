@@ -104,7 +104,7 @@ const ToggleItem: React.FC<ToggleItemProps> = ({
           className="w-9 h-9 rounded-xl items-center justify-center"
           style={{ backgroundColor: colors.primaryLight }}
         >
-          <Ionicons name={icon} size={s(18)} color={colors.primary} />
+          <Ionicons name={icon} size={s(18)} color={value ? "#FFFFFF" : colors.primary} />
         </View>
         <View className="flex-1">
           <Text
@@ -165,7 +165,7 @@ const NavItem: React.FC<NavItemProps> = ({
           <Ionicons
             name={icon}
             size={s(18)}
-            color={danger ? colors.danger : colors.primary}
+            color={isDark ? "#FFFFFF" : (danger ? colors.danger : colors.primary)}
           />
         </View>
         <View className="flex-1">
@@ -210,11 +210,7 @@ const NavItem: React.FC<NavItemProps> = ({
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
 const SettingsScreen: React.FC = () => {
-  const [notifications, setNotifications] = useState(true);
-  const [emailNotifications, setEmailNotifications] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [biometrics, setBiometrics] = useState(true);
-  const [autoSync, setAutoSync] = useState(true);
 
   const colors = darkMode ? darkColors : lightColors;
 
@@ -244,12 +240,7 @@ const SettingsScreen: React.FC = () => {
     );
   };
 
-  const handleClearCache = () => {
-    Alert.alert("Clear cache", "This will remove all temporary files.", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Clear", onPress: () => console.log("Cache cleared") },
-    ]);
-  };
+  
 
   return (
     <View className="flex-1" style={{ backgroundColor: colors.background }}>
@@ -298,7 +289,7 @@ const SettingsScreen: React.FC = () => {
                 className="font-sans-bold"
                 style={{ fontSize: vs(18), color: colors.primary }}
               >
-                JD
+                AD
               </Text>
             </View>
 
@@ -307,25 +298,14 @@ const SettingsScreen: React.FC = () => {
                 className="font-sans-bold"
                 style={{ fontSize: vs(15), color: colors.textPrimary }}
               >
-                John Dela Cruz
+                Admin
               </Text>
               <Text
                 className="font-sans-regular mt-0.5"
                 style={{ fontSize: vs(12), color: colors.textMuted }}
               >
-                john.delacruz@facego.com
+                System Administrator
               </Text>
-              <View
-                className="mt-1.5 self-start rounded-full px-2.5 py-0.5"
-                style={{ backgroundColor: colors.primaryLight }}
-              >
-                <Text
-                  className="font-sans-semibold"
-                  style={{ fontSize: vs(10), color: colors.primary }}
-                >
-                  Administrator
-                </Text>
-              </View>
             </View>
 
             <Ionicons
@@ -336,34 +316,7 @@ const SettingsScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/* ── Notifications ── */}
-        <SectionHeader title="Notifications" isDark={darkMode} />
-        <View
-          className="mx-4 rounded-2xl overflow-hidden"
-          style={{
-            borderWidth: 0.5,
-            borderColor: colors.border,
-            backgroundColor: colors.surface,
-            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
-          }}
-        >
-          <ToggleItem
-            icon="notifications-outline"
-            label="Push notifications"
-            description="Attendance alerts and announcements"
-            value={notifications}
-            onValueChange={setNotifications}
-            isDark={darkMode}
-          />
-          <ToggleItem
-            icon="mail-outline"
-            label="Email notifications"
-            description="Weekly summaries and reports"
-            value={emailNotifications}
-            onValueChange={setEmailNotifications}
-            isDark={darkMode}
-          />
-        </View>
+        
 
         {/* ── Appearance ── */}
         <SectionHeader title="Appearance" isDark={darkMode} />
@@ -383,79 +336,12 @@ const SettingsScreen: React.FC = () => {
             onValueChange={setDarkMode}
             isDark={darkMode}
           />
-          <NavItem
-            icon="language-outline"
-            label="Language"
-            trailing="English (US)"
-            isDark={darkMode}
-          />
+          
         </View>
 
-        {/* ── Security ── */}
-        <SectionHeader title="Security" isDark={darkMode} />
-        <View
-          className="mx-4 rounded-2xl overflow-hidden"
-          style={{
-            borderWidth: 0.5,
-            borderColor: colors.border,
-            backgroundColor: colors.surface,
-            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
-          }}
-        >
-          <ToggleItem
-            icon="finger-print-outline"
-            label="Biometric login"
-            description="Face ID / Fingerprint"
-            value={biometrics}
-            onValueChange={setBiometrics}
-            isDark={darkMode}
-          />
-          <NavItem
-            icon="lock-closed-outline"
-            label="Change password"
-            isDark={darkMode}
-          />
-          <NavItem
-            icon="shield-checkmark-outline"
-            label="Two-factor authentication"
-            description="Add an extra layer of security"
-            isDark={darkMode}
-          />
-        </View>
+        
 
-        {/* ── Data & Sync ── */}
-        <SectionHeader title="Data & Sync" isDark={darkMode} />
-        <View
-          className="mx-4 rounded-2xl overflow-hidden"
-          style={{
-            borderWidth: 0.5,
-            borderColor: colors.border,
-            backgroundColor: colors.surface,
-            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
-          }}
-        >
-          <ToggleItem
-            icon="sync-outline"
-            label="Auto sync"
-            description="Sync attendance data in real time"
-            value={autoSync}
-            onValueChange={setAutoSync}
-            isDark={darkMode}
-          />
-          <NavItem
-            icon="cloud-download-outline"
-            label="Cloud backup"
-            description="Last backup: Today, 10:30 AM"
-            isDark={darkMode}
-          />
-          <NavItem
-            icon="trash-outline"
-            label="Clear cache"
-            description="128 MB of temporary files"
-            isDark={darkMode}
-            onPress={handleClearCache}
-          />
-        </View>
+        
 
         {/* ── About ── */}
         <SectionHeader title="About" isDark={darkMode} />
