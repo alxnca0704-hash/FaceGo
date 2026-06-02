@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import { useState, useEffect } from "react";
 import { Alert } from "react-native";
 
@@ -17,6 +18,7 @@ export const useEmployeeForm = ({
   const [name, setName] = useState("");
   const [employeeId, setEmployeeId] = useState("");
   const [department, setDepartment] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -28,16 +30,23 @@ export const useEmployeeForm = ({
       setEmployeeId("");
       setDepartment("");
     }
+    setIsSaving(false);
   }, [initialData, isVisible]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim() || !employeeId.trim() || !department.trim()) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(
         "Missing information",
         "Please enter a name, employee ID, and department."
       );
       return;
     }
+    
+    setIsSaving(true);
+    // Small delay to show the "dots" loading effect
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    
     onSave({
       name: name.trim(),
       employee_id: employeeId.trim(),
@@ -54,5 +63,6 @@ export const useEmployeeForm = ({
     department,
     setDepartment,
     handleSave,
+    isSaving,
   };
 };

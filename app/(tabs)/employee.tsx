@@ -1,6 +1,7 @@
 import EmployeeCard from "@/components/EmployeeCard";
 import EmployeeModal from "@/components/EmployeeModal";
 import Searchbar from "@/components/ui/Searchbar";
+import FeedbackOverlay from "@/components/ui/FeedbackOverlay";
 import { icons } from "@/constant/icons";
 import { useEmployees } from "@/lib/hooks/useEmployees";
 import { styled } from "nativewind";
@@ -30,6 +31,7 @@ const EmployeeScreen = () => {
     handleSaveEmployee,
     deleteEmployee,
     closeModal,
+    feedbackProps,
   } = useEmployees();
 
   const handleLongPress = (employee: Employee) => {
@@ -126,6 +128,8 @@ const EmployeeScreen = () => {
         onSave={handleSaveEmployee}
         initialData={editingEmployee}
       />
+
+      <FeedbackOverlay {...feedbackProps} />
     </SafeAreaView>
   );
 };

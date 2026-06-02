@@ -1,12 +1,14 @@
 import { employees as initialEmployees } from "@/constant/data";
+import * as Haptics from "expo-haptics";
 import { useState, useMemo } from "react";
-import { Alert } from "react-native";
+import { useFeedback } from "./useFeedback";
 
 export const useEmployees = () => {
   const [search, setSearch] = useState("");
   const [employeeList, setEmployeeList] = useState(initialEmployees);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const { feedbackProps, showFeedback } = useFeedback();
 
   const filteredEmployees = useMemo(() => {
     return employeeList.filter(
@@ -38,7 +40,8 @@ export const useEmployees = () => {
           emp.id === editingEmployee.id ? { ...emp, ...data } : emp
         )
       );
-      Alert.alert("Success", "Employee updated successfully");
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      showFeedback("success", "Employee Updated");
     } else {
       const newEmployee: Employee = {
         id: Date.now().toString(),
@@ -50,12 +53,15 @@ export const useEmployees = () => {
         status: "Inactive",
       };
       setEmployeeList((prev) => [newEmployee, ...prev]);
-      Alert.alert("Success", "New employee added successfully");
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      showFeedback("success", "Employee Created");
     }
   };
 
   const deleteEmployee = (id: string) => {
     setEmployeeList((prev) => prev.filter((e) => e.id !== id));
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    showFeedback("delete", "Employee Deleted");
   };
 
   return {
@@ -69,5 +75,6 @@ export const useEmployees = () => {
     handleSaveEmployee,
     deleteEmployee,
     closeModal,
+    feedbackProps,
   };
 };
