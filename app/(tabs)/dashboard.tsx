@@ -1,10 +1,10 @@
 import EmployeeCard from "@/components/EmployeeCard";
 import QuickActionCard from "@/components/QuickActionCard";
 import StatsCard from "@/components/StatsCard";
-import { employees, QUICK_ACTIONS, STATS } from "@/constant/data";
+import { QUICK_ACTIONS, STATS } from "@/constant/data";
 import { icons } from "@/constant/icons";
 import { images } from "@/constant/images";
-import { useRouter } from "expo-router";
+import { useDashboard } from "@/lib/hooks/useDashboard";
 import { styled } from "nativewind";
 import React from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
@@ -14,22 +14,12 @@ import { s, vs } from "react-native-size-matters";
 const SafeAreaView = styled(RNSafeAreaView);
 
 const Dashboard = () => {
-  const router = useRouter();
-
-  const handleQuickAction = (id: string) => {
-    if (id === "face-scan") {
-      router.push("/scanning");
-    } else if (id === "download-records") {
-      router.push("/download-records");
-    } else if (id === "add-employee") {
-      router.push("/(tabs)/employee");
-    }
-  };
+  const { handleQuickAction, recentActivity, router } = useDashboard();
 
   return (
     <SafeAreaView className="flex-1 bg-background pb-1" edges={["top"]}>
       <FlatList
-        data={employees.slice(0, 5)}
+        data={recentActivity}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{

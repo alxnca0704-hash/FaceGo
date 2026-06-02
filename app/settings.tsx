@@ -1,91 +1,115 @@
-import { cn } from '@/lib/utils'
-import { Ionicons } from '@expo/vector-icons'
-import { router } from 'expo-router'
-import React, { useState } from 'react'
+import { cn } from "@/lib/utils";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import React, { useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View
-} from 'react-native'
-import { s, vs } from 'react-native-size-matters'
+  Alert,
+  ScrollView,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { s, vs } from "react-native-size-matters";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Theme ──────────────────────────────────────────────────────────────────
+
+import { colors as COLORS } from "@/constant/theme";
+
+const LIGHT_SHADOW = {
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.04,
+  shadowRadius: 4,
+  elevation: 1,
+};
+
+const DARK_SHADOW = {
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.15,
+  shadowRadius: 6,
+  elevation: 2,
+};
+
+const LIGHT_COLORS = {
+  primary: COLORS.primary,
+  primaryLight: COLORS.primaryLight,
+  surface: "#FFFFFF",
+  background: "#FFFFFF",
+  border: COLORS.border,
+  textPrimary: COLORS.textPrimary,
+  textSecondary: COLORS.textSecondary,
+  textMuted: COLORS.textMuted,
+  danger: COLORS.danger,
+  dangerLight: COLORS.dangerLight,
+  success: COLORS.success,
+  warning: COLORS.warning,
+};
+
+const DARK_COLORS = {
+  primary: "#93C5FD",
+  primaryLight: "rgba(59, 130, 246, 0.15)",
+  surface: "#1C1C1E",
+  background: "#000000",
+  border: "#2C2C2E",
+  textPrimary: "#F5F5F7",
+  textSecondary: "#AEAEB2",
+  textMuted: "#8E8E93",
+  danger: "#FF6B6B",
+  dangerLight: "rgba(255, 107, 107, 0.15)",
+  success: "#34D399",
+  warning: "#FBBF24",
+};
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface ToggleItemProps {
-  icon: keyof typeof Ionicons.glyphMap
-  label: string
-  description?: string
-  value: boolean
-  onValueChange: (v: boolean) => void
-  isDark?: boolean
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  description?: string;
+  value: boolean;
+  onValueChange: (v: boolean) => void;
+  isDark?: boolean;
 }
 
 interface NavItemProps {
-  icon: keyof typeof Ionicons.glyphMap
-  label: string
-  description?: string
-  trailing?: string
-  danger?: boolean
-  onPress?: () => void
-  isDark?: boolean
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  description?: string;
+  trailing?: string;
+  danger?: boolean;
+  onPress?: () => void;
+  isDark?: boolean;
 }
 
 interface SectionHeaderProps {
-  title: string
-  isDark?: boolean
-}
-
-// ─── Theme Colors ──────────────────────────────────────────────────────────────
-
-const LIGHT_COLORS = {
-  primary: '#0b0c0e',
-  primaryLight: '#EFF6FF',
-  surface: '#FFFFFF',
-  background: '#F5F7FA',
-  border: '#E5E7EB',
-  textPrimary: '#111827',
-  textSecondary: '#6B7280',
-  textMuted: '#9CA3AF',
-  danger: '#EF4444',
-  dangerLight: '#FEF2F2',
-  success: '#10B981',
-  warning: '#F59E0B',
-}
-
-const DARK_COLORS = {
-  primary: '#93C5FD',
-  primaryLight: 'rgba(59, 130, 246, 0.15)',
-  surface: '#1C1C1E',
-  background: '#000000',
-  border: '#2C2C2E',
-  textPrimary: '#F5F5F7',
-  textSecondary: '#AEAEB2',
-  textMuted: '#8E8E93',
-  danger: '#FF6B6B',
-  dangerLight: 'rgba(255, 107, 107, 0.15)',
-  success: '#34D399',
-  warning: '#FBBF24',
+  title: string;
+  isDark?: boolean;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 const SectionHeader: React.FC<SectionHeaderProps> = ({ title, isDark }) => {
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS
+  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
+  const shadow = isDark ? DARK_SHADOW : LIGHT_SHADOW;
 
   return (
     <View className="px-5 pt-6 pb-2">
       <Text
         className="font-sans-semibold"
-        style={{ fontSize: vs(10), color: colors.primary, letterSpacing: 1.2, textTransform: 'uppercase' }}
+        style={{
+          fontSize: vs(10),
+          color: isDark ? colors.primary : "#000",
+          letterSpacing: 1.2,
+          textTransform: "uppercase",
+        }}
       >
         {title}
       </Text>
     </View>
-  )
-}
+  );
+};
 
 const ToggleItem: React.FC<ToggleItemProps> = ({
   icon,
@@ -95,7 +119,7 @@ const ToggleItem: React.FC<ToggleItemProps> = ({
   onValueChange,
   isDark = false,
 }) => {
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS
+  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
 
   return (
     <View
@@ -137,8 +161,8 @@ const ToggleItem: React.FC<ToggleItemProps> = ({
         ios_backgroundColor={colors.border}
       />
     </View>
-  )
-}
+  );
+};
 
 const NavItem: React.FC<NavItemProps> = ({
   icon,
@@ -149,7 +173,7 @@ const NavItem: React.FC<NavItemProps> = ({
   onPress,
   isDark = false,
 }) => {
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS
+  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
 
   return (
     <TouchableOpacity
@@ -177,7 +201,10 @@ const NavItem: React.FC<NavItemProps> = ({
         <View className="flex-1">
           <Text
             className="font-sans-medium"
-            style={{ fontSize: vs(13), color: danger ? colors.danger : colors.textPrimary }}
+            style={{
+              fontSize: vs(13),
+              color: danger ? colors.danger : colors.textPrimary,
+            }}
           >
             {label}
           </Text>
@@ -207,48 +234,52 @@ const NavItem: React.FC<NavItemProps> = ({
         />
       </View>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
 const SettingsScreen: React.FC = () => {
-  const [notifications, setNotifications] = useState(true)
-  const [emailNotifications, setEmailNotifications] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
-  const [biometrics, setBiometrics] = useState(true)
-  const [autoSync, setAutoSync] = useState(true)
+  const [notifications, setNotifications] = useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [biometrics, setBiometrics] = useState(true);
+  const [autoSync, setAutoSync] = useState(true);
 
-  const colors = darkMode ? DARK_COLORS : LIGHT_COLORS
+  const colors = darkMode ? DARK_COLORS : LIGHT_COLORS;
 
   const handleLogout = () => {
-    Alert.alert('Log out', 'Are you sure you want to log out?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert("Log out", "Are you sure you want to log out?", [
+      { text: "Cancel", style: "cancel" },
       {
-        text: 'Log out',
-        style: 'destructive',
-        onPress: () => router.replace('/'),
+        text: "Log out",
+        style: "destructive",
+        onPress: () => router.replace("/"),
       },
-    ])
-  }
+    ]);
+  };
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Delete account',
-      'This action is permanent and cannot be undone. All your data will be erased.',
+      "Delete account",
+      "This action is permanent and cannot be undone. All your data will be erased.",
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => console.log('Account deleted') },
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => console.log("Account deleted"),
+        },
       ]
-    )
-  }
+    );
+  };
 
   const handleClearCache = () => {
-    Alert.alert('Clear cache', 'This will remove all temporary files.', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Clear', onPress: () => console.log('Cache cleared') },
-    ])
-  }
+    Alert.alert("Clear cache", "This will remove all temporary files.", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Clear", onPress: () => console.log("Cache cleared") },
+    ]);
+  };
 
   return (
     <View className="flex-1" style={{ backgroundColor: colors.background }}>
@@ -277,7 +308,6 @@ const SettingsScreen: React.FC = () => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-
         {/* ── Profile Card ── */}
         <View className="mx-4 mt-5 mb-1">
           <TouchableOpacity
@@ -287,14 +317,13 @@ const SettingsScreen: React.FC = () => {
               backgroundColor: colors.surface,
               borderWidth: 0.5,
               borderColor: colors.border,
-              shadowColor: '#000',
+              shadowColor: "#000",
               shadowOffset: { width: 0, height: 1 },
               shadowOpacity: 0.04,
               shadowRadius: 4,
               elevation: 1,
             }}
           >
-            {/* Avatar */}
             <View
               className="w-14 h-14 rounded-2xl items-center justify-center"
               style={{ backgroundColor: colors.primaryLight }}
@@ -307,7 +336,6 @@ const SettingsScreen: React.FC = () => {
               </Text>
             </View>
 
-            {/* Info */}
             <View className="flex-1">
               <Text
                 className="font-sans-bold"
@@ -334,13 +362,25 @@ const SettingsScreen: React.FC = () => {
               </View>
             </View>
 
-            <Ionicons name="chevron-forward" size={s(18)} color={colors.textMuted} />
+            <Ionicons
+              name="chevron-forward"
+              size={s(18)}
+              color={colors.textMuted}
+            />
           </TouchableOpacity>
         </View>
 
         {/* ── Notifications ── */}
         <SectionHeader title="Notifications" isDark={darkMode} />
-        <View className="mx-4 rounded-2xl overflow-hidden" style={{ borderWidth: 0.5, borderColor: colors.border }}>
+        <View
+          className="mx-4 rounded-2xl overflow-hidden"
+          style={{
+            borderWidth: 0.5,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
+          }}
+        >
           <ToggleItem
             icon="notifications-outline"
             label="Push notifications"
@@ -361,7 +401,15 @@ const SettingsScreen: React.FC = () => {
 
         {/* ── Appearance ── */}
         <SectionHeader title="Appearance" isDark={darkMode} />
-        <View className="mx-4 rounded-2xl overflow-hidden" style={{ borderWidth: 0.5, borderColor: colors.border }}>
+        <View
+          className="mx-4 rounded-2xl overflow-hidden"
+          style={{
+            borderWidth: 0.5,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
+          }}
+        >
           <ToggleItem
             icon="moon-outline"
             label="Dark mode"
@@ -379,7 +427,15 @@ const SettingsScreen: React.FC = () => {
 
         {/* ── Security ── */}
         <SectionHeader title="Security" isDark={darkMode} />
-        <View className="mx-4 rounded-2xl overflow-hidden" style={{ borderWidth: 0.5, borderColor: colors.border }}>
+        <View
+          className="mx-4 rounded-2xl overflow-hidden"
+          style={{
+            borderWidth: 0.5,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
+          }}
+        >
           <ToggleItem
             icon="finger-print-outline"
             label="Biometric login"
@@ -403,7 +459,15 @@ const SettingsScreen: React.FC = () => {
 
         {/* ── Data & Sync ── */}
         <SectionHeader title="Data & Sync" isDark={darkMode} />
-        <View className="mx-4 rounded-2xl overflow-hidden" style={{ borderWidth: 0.5, borderColor: colors.border }}>
+        <View
+          className="mx-4 rounded-2xl overflow-hidden"
+          style={{
+            borderWidth: 0.5,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
+          }}
+        >
           <ToggleItem
             icon="sync-outline"
             label="Auto sync"
@@ -429,7 +493,15 @@ const SettingsScreen: React.FC = () => {
 
         {/* ── About ── */}
         <SectionHeader title="About" isDark={darkMode} />
-        <View className="mx-4 rounded-2xl overflow-hidden" style={{ borderWidth: 0.5, borderColor: colors.border }}>
+        <View
+          className="mx-4 rounded-2xl overflow-hidden"
+          style={{
+            borderWidth: 0.5,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
+          }}
+        >
           <NavItem
             icon="information-circle-outline"
             label="App version"
@@ -455,7 +527,15 @@ const SettingsScreen: React.FC = () => {
 
         {/* ── Danger Zone ── */}
         <SectionHeader title="Account" isDark={darkMode} />
-        <View className="mx-4 rounded-2xl overflow-hidden" style={{ borderWidth: 0.5, borderColor: colors.border }}>
+        <View
+          className="mx-4 rounded-2xl overflow-hidden"
+          style={{
+            borderWidth: 0.5,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
+          }}
+        >
           <NavItem
             icon="log-out-outline"
             label="Log out"
@@ -476,7 +556,7 @@ const SettingsScreen: React.FC = () => {
         <View style={{ height: vs(40) }} />
       </ScrollView>
     </View>
-  )
-}
+  );
+};
 
-export default SettingsScreen
+export default SettingsScreen;

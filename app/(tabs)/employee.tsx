@@ -1,10 +1,10 @@
 import EmployeeCard from "@/components/EmployeeCard";
 import EmployeeModal from "@/components/EmployeeModal";
 import Searchbar from "@/components/ui/Searchbar";
-import { employees as initialEmployees } from "@/constant/data";
 import { icons } from "@/constant/icons";
+import { useEmployees } from "@/lib/hooks/useEmployees";
 import { styled } from "nativewind";
-import React, { useState } from "react";
+import React from "react";
 import {
   Alert,
   FlatList,
@@ -19,45 +19,18 @@ import { s, vs } from "react-native-size-matters";
 const SafeAreaView = styled(RNSafeAreaView);
 
 const EmployeeScreen = () => {
-  const [search, setSearch] = useState("");
-  const [employeeList, setEmployeeList] = useState(initialEmployees);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-
-  const filteredEmployees = employeeList.filter(
-    (emp) =>
-      emp.name.toLowerCase().includes(search.toLowerCase()) ||
-      emp.employee_id.toLowerCase().includes(search.toLowerCase()),
-  );
-
-  const handleOpenAddModal = () => {
-    setEditingEmployee(null);
-    setIsModalVisible(true);
-  };
-
-  const handleSaveEmployee = (data: Partial<Employee>) => {
-    if (editingEmployee) {
-      // Edit logic
-      setEmployeeList(
-        employeeList.map((emp) =>
-          emp.id === editingEmployee.id ? { ...emp, ...data } : emp,
-        ),
-      );
-      Alert.alert("Success", "Employee updated successfully");
-    } else {
-      // Add logic
-      const newEmployee: Employee = {
-        id: Date.now().toString(),
-        name: data.name!,
-        employee_id: data.employee_id!,
-        time_in: null,
-        time_out: null,
-        status: "Absent",
-      };
-      setEmployeeList([newEmployee, ...employeeList]);
-      Alert.alert("Success", "New employee added successfully");
-    }
-  };
+  const {
+    search,
+    setSearch,
+    filteredEmployees,
+    isModalVisible,
+    editingEmployee,
+    handleOpenAddModal,
+    handleEditEmployee,
+    handleSaveEmployee,
+    deleteEmployee,
+    closeModal,
+  } = useEmployees();
 
   const handleLongPress = (employee: Employee) => {
     Alert.alert(
@@ -70,10 +43,7 @@ const EmployeeScreen = () => {
         },
         {
           text: "Edit",
-          onPress: () => {
-            setEditingEmployee(employee);
-            setIsModalVisible(true);
-          },
+          onPress: () => handleEditEmployee(employee),
         },
         {
           text: "Delete",
@@ -87,11 +57,7 @@ const EmployeeScreen = () => {
                 {
                   text: "Delete",
                   style: "destructive",
-                  onPress: () => {
-                    setEmployeeList(
-                      employeeList.filter((e) => e.id !== employee.id),
-                    );
-                  },
+                  onPress: () => deleteEmployee(employee.id),
                 },
               ],
             );
@@ -156,7 +122,7 @@ const EmployeeScreen = () => {
 
       <EmployeeModal
         isVisible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
+        onClose={closeModal}
         onSave={handleSaveEmployee}
         initialData={editingEmployee}
       />

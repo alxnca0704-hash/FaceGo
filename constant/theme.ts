@@ -11,6 +11,15 @@ export const colors = {
   destructive: "#dc2626",
   subscription: "#8fd1bd",
   shadow: "#000",
+  black: "00000",
+  primaryLight: "#EFF6FF",
+  surface: "#FFFFFF",
+  textPrimary: "#111827",
+  textSecondary: "#6B7280",
+  textMuted: "#9CA3AF",
+  danger: "#EF4444",
+  dangerLight: "#FEF2F2",
+  warning: "#F59E0B",
 } as const;
 
 export const spacing = {
