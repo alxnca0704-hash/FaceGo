@@ -33,6 +33,7 @@ const EmployeeModal = ({
     department,
     setDepartment,
     handleSave,
+    isSaving,
   } = useEmployeeForm({ initialData, isVisible, onSave, onClose });
 
   return (
@@ -108,12 +109,21 @@ const EmployeeModal = ({
 
                 <TouchableOpacity
                   onPress={handleSave}
+                  disabled={isSaving}
                   className="bg-primary h-14 rounded-2xl items-center justify-center shadow-lg"
                   activeOpacity={0.8}
                 >
-                  <Text className="text-white font-sans-bold text-lg">
-                    {initialData ? "Save Changes" : "Create Employee"}
-                  </Text>
+                  {isSaving ? (
+                    <View className="flex-row items-center justify-center gap-2">
+                      <View className="w-2 h-2 rounded-full bg-white opacity-40" />
+                      <View className="w-2 h-2 rounded-full bg-white opacity-70" />
+                      <View className="w-2 h-2 rounded-full bg-white" />
+                    </View>
+                  ) : (
+                    <Text className="text-white font-sans-bold text-lg">
+                      {initialData ? "Save Changes" : "Create Employee"}
+                    </Text>
+                  )}
                 </TouchableOpacity>
               </ScrollView>
             </View>
