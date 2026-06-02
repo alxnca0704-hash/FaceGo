@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -12,7 +11,29 @@ import {
 } from "react-native";
 import { s, vs } from "react-native-size-matters";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Theme ──────────────────────────────────────────────────────────────────
+
+import { darkColors, lightColors } from "@/constant/theme";
+
+const LIGHT_SHADOW = {
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.04,
+  shadowRadius: 4,
+  elevation: 1,
+};
+
+const DARK_SHADOW = {
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.15,
+  shadowRadius: 6,
+  elevation: 2,
+};
+
+
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface ToggleItemProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -20,6 +41,7 @@ interface ToggleItemProps {
   description?: string;
   value: boolean;
   onValueChange: (v: boolean) => void;
+  isDark?: boolean;
 }
 
 interface NavItemProps {
@@ -29,41 +51,35 @@ interface NavItemProps {
   trailing?: string;
   danger?: boolean;
   onPress?: () => void;
+  isDark?: boolean;
 }
 
 interface SectionHeaderProps {
   title: string;
+  isDark?: boolean;
 }
-
-// ─── Theme (mirrors constant/theme.ts conventions) ────────────────────────────
-
-const COLORS = {
-  primary: "#3B82F6", // brand blue
-  primaryLight: "#EFF6FF",
-  surface: "#FFFFFF",
-  background: "#F5F7FA",
-  border: "#E5E7EB",
-  textPrimary: "#111827",
-  textSecondary: "#6B7280",
-  textMuted: "#9CA3AF",
-  danger: "#EF4444",
-  dangerLight: "#FEF2F2",
-  success: "#10B981",
-  warning: "#F59E0B",
-};
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-const SectionHeader: React.FC<SectionHeaderProps> = ({ title }) => (
-  <View className="px-5 pt-6 pb-2">
-    <Text
-      className="font-sans-semibold text-primary uppercase tracking-widest"
-      style={{ fontSize: vs(10), color: COLORS.primary, letterSpacing: 1.2 }}
-    >
-      {title}
-    </Text>
-  </View>
-);
+const SectionHeader: React.FC<SectionHeaderProps> = ({ title, isDark }) => {
+  const colors = isDark ? darkColors : lightColors;
+
+  return (
+    <View className="px-5 pt-6 pb-2">
+      <Text
+        className="font-sans-semibold"
+        style={{
+          fontSize: vs(10),
+          color: isDark ? colors.primary : colors.textPrimary,
+          letterSpacing: 1.2,
+          textTransform: "uppercase",
+        }}
+      >
+        {title}
+      </Text>
+    </View>
+  );
+};
 
 const ToggleItem: React.FC<ToggleItemProps> = ({
   icon,
@@ -71,41 +87,52 @@ const ToggleItem: React.FC<ToggleItemProps> = ({
   description,
   value,
   onValueChange,
-}) => (
-  <View className="flex-row items-center justify-between px-5 py-3 bg-white border-b border-gray-100">
-    <View className="flex-row items-center flex-1 gap-3">
-      <View
-        className="w-9 h-9 rounded-xl items-center justify-center"
-        style={{ backgroundColor: COLORS.primaryLight }}
-      >
-        <Ionicons name={icon} size={s(18)} color={COLORS.primary} />
-      </View>
-      <View className="flex-1">
-        <Text
-          className="font-sans-medium text-gray-900"
-          style={{ fontSize: vs(13) }}
+  isDark = false,
+}) => {
+  const colors = isDark ? darkColors : lightColors;
+
+  return (
+    <View
+      className="flex-row items-center justify-between px-5 py-3 border-b"
+      style={{
+        backgroundColor: colors.surface,
+        borderColor: colors.border,
+      }}
+    >
+      <View className="flex-row items-center flex-1 gap-3">
+        <View
+          className="w-9 h-9 rounded-xl items-center justify-center"
+          style={{ backgroundColor: colors.primaryLight }}
         >
-          {label}
-        </Text>
-        {description ? (
+          <Ionicons name={icon} size={s(18)} color={colors.primary} />
+        </View>
+        <View className="flex-1">
           <Text
-            className="font-sans-regular text-gray-400 mt-0.5"
-            style={{ fontSize: vs(11) }}
+            className="font-sans-medium"
+            style={{ fontSize: vs(13), color: colors.textPrimary }}
           >
-            {description}
+            {label}
           </Text>
-        ) : null}
+          {description ? (
+            <Text
+              className="font-sans-regular mt-0.5"
+              style={{ fontSize: vs(11), color: colors.textMuted }}
+            >
+              {description}
+            </Text>
+          ) : null}
+        </View>
       </View>
+      <Switch
+        value={value}
+        onValueChange={onValueChange}
+        trackColor={{ false: colors.border, true: colors.primary }}
+        thumbColor="#FFFFFF"
+        ios_backgroundColor={colors.border}
+      />
     </View>
-    <Switch
-      value={value}
-      onValueChange={onValueChange}
-      trackColor={{ false: COLORS.border, true: COLORS.primary }}
-      thumbColor="#FFFFFF"
-      ios_backgroundColor={COLORS.border}
-    />
-  </View>
-);
+  );
+};
 
 const NavItem: React.FC<NavItemProps> = ({
   icon,
@@ -114,62 +141,71 @@ const NavItem: React.FC<NavItemProps> = ({
   trailing,
   danger = false,
   onPress,
-}) => (
-  <TouchableOpacity
-    onPress={onPress}
-    activeOpacity={0.7}
-    className="flex-row items-center justify-between px-5 py-3 bg-white border-b border-gray-100"
-  >
-    <View className="flex-row items-center flex-1 gap-3">
-      <View
-        className="w-9 h-9 rounded-xl items-center justify-center"
-        style={{
-          backgroundColor: danger ? COLORS.dangerLight : COLORS.primaryLight,
-        }}
-      >
-        <Ionicons
-          name={icon}
-          size={s(18)}
-          color={danger ? COLORS.danger : COLORS.primary}
-        />
-      </View>
-      <View className="flex-1">
-        <Text
-          className={cn(
-            "font-sans-medium",
-            danger ? "text-red-500" : "text-gray-900",
-          )}
-          style={{ fontSize: vs(13) }}
+  isDark = false,
+}) => {
+  const colors = isDark ? darkColors : lightColors;
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      className="flex-row items-center justify-between px-5 py-3 border-b"
+      style={{
+        backgroundColor: colors.surface,
+        borderColor: colors.border,
+      }}
+    >
+      <View className="flex-row items-center flex-1 gap-3">
+        <View
+          className="w-9 h-9 rounded-xl items-center justify-center"
+          style={{
+            backgroundColor: danger ? colors.dangerLight : colors.primaryLight,
+          }}
         >
-          {label}
-        </Text>
-        {description ? (
+          <Ionicons
+            name={icon}
+            size={s(18)}
+            color={danger ? colors.danger : colors.primary}
+          />
+        </View>
+        <View className="flex-1">
           <Text
-            className="font-sans-regular text-gray-400 mt-0.5"
-            style={{ fontSize: vs(11) }}
+            className="font-sans-medium"
+            style={{
+              fontSize: vs(13),
+              color: danger ? colors.danger : colors.textPrimary,
+            }}
           >
-            {description}
+            {label}
+          </Text>
+          {description ? (
+            <Text
+              className="font-sans-regular mt-0.5"
+              style={{ fontSize: vs(11), color: colors.textMuted }}
+            >
+              {description}
+            </Text>
+          ) : null}
+        </View>
+      </View>
+      <View className="flex-row items-center gap-1">
+        {trailing ? (
+          <Text
+            className="font-sans-regular"
+            style={{ fontSize: vs(12), color: colors.textMuted }}
+          >
+            {trailing}
           </Text>
         ) : null}
+        <Ionicons
+          name="chevron-forward"
+          size={s(16)}
+          color={danger ? colors.danger : colors.textMuted}
+        />
       </View>
-    </View>
-    <View className="flex-row items-center gap-1">
-      {trailing ? (
-        <Text
-          className="font-sans-regular text-gray-400"
-          style={{ fontSize: vs(12) }}
-        >
-          {trailing}
-        </Text>
-      ) : null}
-      <Ionicons
-        name="chevron-forward"
-        size={s(16)}
-        color={danger ? COLORS.danger : COLORS.textMuted}
-      />
-    </View>
-  </TouchableOpacity>
-);
+    </TouchableOpacity>
+  );
+};
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
@@ -179,6 +215,8 @@ const SettingsScreen: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [biometrics, setBiometrics] = useState(true);
   const [autoSync, setAutoSync] = useState(true);
+
+  const colors = darkMode ? darkColors : lightColors;
 
   const handleLogout = () => {
     Alert.alert("Log out", "Are you sure you want to log out?", [
@@ -202,7 +240,7 @@ const SettingsScreen: React.FC = () => {
           style: "destructive",
           onPress: () => console.log("Account deleted"),
         },
-      ],
+      ]
     );
   };
 
@@ -214,21 +252,26 @@ const SettingsScreen: React.FC = () => {
   };
 
   return (
-    <View className="flex-1" style={{ backgroundColor: COLORS.background }}>
+    <View className="flex-1" style={{ backgroundColor: colors.background }}>
+
       {/* ── Header ── */}
       <View
-        className="bg-white border-b border-gray-100 px-5 pb-4"
-        style={{ paddingTop: vs(56) }}
+        className="px-5 pb-4 border-b"
+        style={{
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          paddingTop: vs(56),
+        }}
       >
         <Text
-          className="font-sans-extrabold text-gray-900"
-          style={{ fontSize: vs(24) }}
+          className="font-sans-extrabold"
+          style={{ fontSize: vs(24), color: colors.textPrimary }}
         >
           Settings
         </Text>
         <Text
-          className="font-sans-regular text-gray-400 mt-0.5"
-          style={{ fontSize: vs(12) }}
+          className="font-sans-regular mt-0.5"
+          style={{ fontSize: vs(12), color: colors.textMuted }}
         >
           Manage your account and preferences
         </Text>
@@ -239,51 +282,46 @@ const SettingsScreen: React.FC = () => {
         <View className="mx-4 mt-5 mb-1">
           <TouchableOpacity
             activeOpacity={0.8}
-            className="bg-white rounded-2xl p-4 flex-row items-center gap-4"
+            className="rounded-2xl p-4 flex-row items-center gap-4"
             style={{
+              backgroundColor: colors.surface,
               borderWidth: 0.5,
-              borderColor: COLORS.border,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.04,
-              shadowRadius: 4,
-              elevation: 1,
+              borderColor: colors.border,
+              ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
             }}
           >
-            {/* Avatar */}
             <View
               className="w-14 h-14 rounded-2xl items-center justify-center"
-              style={{ backgroundColor: COLORS.primaryLight }}
+              style={{ backgroundColor: colors.primaryLight }}
             >
               <Text
                 className="font-sans-bold"
-                style={{ fontSize: vs(18), color: COLORS.primary }}
+                style={{ fontSize: vs(18), color: colors.primary }}
               >
                 JD
               </Text>
             </View>
 
-            {/* Info */}
             <View className="flex-1">
               <Text
-                className="font-sans-bold text-gray-900"
-                style={{ fontSize: vs(15) }}
+                className="font-sans-bold"
+                style={{ fontSize: vs(15), color: colors.textPrimary }}
               >
                 John Dela Cruz
               </Text>
               <Text
-                className="font-sans-regular text-gray-400 mt-0.5"
-                style={{ fontSize: vs(12) }}
+                className="font-sans-regular mt-0.5"
+                style={{ fontSize: vs(12), color: colors.textMuted }}
               >
                 john.delacruz@facego.com
               </Text>
               <View
                 className="mt-1.5 self-start rounded-full px-2.5 py-0.5"
-                style={{ backgroundColor: COLORS.primaryLight }}
+                style={{ backgroundColor: colors.primaryLight }}
               >
                 <Text
                   className="font-sans-semibold"
-                  style={{ fontSize: vs(10), color: COLORS.primary }}
+                  style={{ fontSize: vs(10), color: colors.primary }}
                 >
                   Administrator
                 </Text>
@@ -293,16 +331,21 @@ const SettingsScreen: React.FC = () => {
             <Ionicons
               name="chevron-forward"
               size={s(18)}
-              color={COLORS.textMuted}
+              color={colors.textMuted}
             />
           </TouchableOpacity>
         </View>
 
         {/* ── Notifications ── */}
-        <SectionHeader title="Notifications" />
+        <SectionHeader title="Notifications" isDark={darkMode} />
         <View
           className="mx-4 rounded-2xl overflow-hidden"
-          style={{ borderWidth: 0.5, borderColor: COLORS.border }}
+          style={{
+            borderWidth: 0.5,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
+          }}
         >
           <ToggleItem
             icon="notifications-outline"
@@ -310,6 +353,7 @@ const SettingsScreen: React.FC = () => {
             description="Attendance alerts and announcements"
             value={notifications}
             onValueChange={setNotifications}
+            isDark={darkMode}
           />
           <ToggleItem
             icon="mail-outline"
@@ -317,33 +361,46 @@ const SettingsScreen: React.FC = () => {
             description="Weekly summaries and reports"
             value={emailNotifications}
             onValueChange={setEmailNotifications}
+            isDark={darkMode}
           />
         </View>
 
         {/* ── Appearance ── */}
-        <SectionHeader title="Appearance" />
+        <SectionHeader title="Appearance" isDark={darkMode} />
         <View
           className="mx-4 rounded-2xl overflow-hidden"
-          style={{ borderWidth: 0.5, borderColor: COLORS.border }}
+          style={{
+            borderWidth: 0.5,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
+          }}
         >
           <ToggleItem
             icon="moon-outline"
             label="Dark mode"
             value={darkMode}
             onValueChange={setDarkMode}
+            isDark={darkMode}
           />
           <NavItem
             icon="language-outline"
             label="Language"
             trailing="English (US)"
+            isDark={darkMode}
           />
         </View>
 
         {/* ── Security ── */}
-        <SectionHeader title="Security" />
+        <SectionHeader title="Security" isDark={darkMode} />
         <View
           className="mx-4 rounded-2xl overflow-hidden"
-          style={{ borderWidth: 0.5, borderColor: COLORS.border }}
+          style={{
+            borderWidth: 0.5,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
+          }}
         >
           <ToggleItem
             icon="finger-print-outline"
@@ -351,20 +408,31 @@ const SettingsScreen: React.FC = () => {
             description="Face ID / Fingerprint"
             value={biometrics}
             onValueChange={setBiometrics}
+            isDark={darkMode}
           />
-          <NavItem icon="lock-closed-outline" label="Change password" />
+          <NavItem
+            icon="lock-closed-outline"
+            label="Change password"
+            isDark={darkMode}
+          />
           <NavItem
             icon="shield-checkmark-outline"
             label="Two-factor authentication"
             description="Add an extra layer of security"
+            isDark={darkMode}
           />
         </View>
 
         {/* ── Data & Sync ── */}
-        <SectionHeader title="Data & Sync" />
+        <SectionHeader title="Data & Sync" isDark={darkMode} />
         <View
           className="mx-4 rounded-2xl overflow-hidden"
-          style={{ borderWidth: 0.5, borderColor: COLORS.border }}
+          style={{
+            borderWidth: 0.5,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
+          }}
         >
           <ToggleItem
             icon="sync-outline"
@@ -372,45 +440,72 @@ const SettingsScreen: React.FC = () => {
             description="Sync attendance data in real time"
             value={autoSync}
             onValueChange={setAutoSync}
+            isDark={darkMode}
           />
           <NavItem
             icon="cloud-download-outline"
             label="Cloud backup"
             description="Last backup: Today, 10:30 AM"
+            isDark={darkMode}
           />
           <NavItem
             icon="trash-outline"
             label="Clear cache"
             description="128 MB of temporary files"
+            isDark={darkMode}
             onPress={handleClearCache}
           />
         </View>
 
         {/* ── About ── */}
-        <SectionHeader title="About" />
+        <SectionHeader title="About" isDark={darkMode} />
         <View
           className="mx-4 rounded-2xl overflow-hidden"
-          style={{ borderWidth: 0.5, borderColor: COLORS.border }}
+          style={{
+            borderWidth: 0.5,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
+          }}
         >
           <NavItem
             icon="information-circle-outline"
             label="App version"
             trailing="v1.0.0"
+            isDark={darkMode}
           />
-          <NavItem icon="document-text-outline" label="Terms of service" />
-          <NavItem icon="shield-outline" label="Privacy policy" />
-          <NavItem icon="help-circle-outline" label="Help & support" />
+          <NavItem
+            icon="document-text-outline"
+            label="Terms of service"
+            isDark={darkMode}
+          />
+          <NavItem
+            icon="shield-outline"
+            label="Privacy policy"
+            isDark={darkMode}
+          />
+          <NavItem
+            icon="help-circle-outline"
+            label="Help & support"
+            isDark={darkMode}
+          />
         </View>
 
         {/* ── Danger Zone ── */}
-        <SectionHeader title="Account" />
+        <SectionHeader title="Account" isDark={darkMode} />
         <View
           className="mx-4 rounded-2xl overflow-hidden"
-          style={{ borderWidth: 0.5, borderColor: COLORS.border }}
+          style={{
+            borderWidth: 0.5,
+            borderColor: colors.border,
+            backgroundColor: colors.surface,
+            ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
+          }}
         >
           <NavItem
             icon="log-out-outline"
             label="Log out"
+            isDark={darkMode}
             onPress={handleLogout}
           />
           <NavItem
@@ -418,6 +513,7 @@ const SettingsScreen: React.FC = () => {
             label="Delete account"
             description="Permanently remove your account"
             danger
+            isDark={darkMode}
             onPress={handleDeleteAccount}
           />
         </View>
