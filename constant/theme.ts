@@ -11,7 +11,7 @@ export const colors = {
   destructive: "#dc2626",
   subscription: "#8fd1bd",
   shadow: "#000",
-  black: "00000",
+  black: "#000000",
   primaryLight: "#EFF6FF",
   surface: "#FFFFFF",
   textPrimary: "#111827",
@@ -21,6 +21,36 @@ export const colors = {
   dangerLight: "#FEF2F2",
   warning: "#F59E0B",
 } as const;
+
+export const lightColors = {
+  primary: colors.primary,
+  primaryLight: colors.primaryLight,
+  surface: colors.surface,
+  background: colors.surface,
+  border: colors.border,
+  textPrimary: colors.textPrimary,
+  textSecondary: colors.textSecondary,
+  textMuted: colors.textMuted,
+  danger: colors.danger,
+  dangerLight: colors.dangerLight,
+  success: colors.success,
+  warning: colors.warning,
+};
+
+export const darkColors = {
+  primary: "#93C5FD",
+  primaryLight: "rgba(59, 130, 246, 0.15)",
+  surface: "#1C1C1E",
+  background: "#000000",
+  border: "#2C2C2E",
+  textPrimary: "#F5F5F7",
+  textSecondary: "#AEAEB2",
+  textMuted: "#8E8E93",
+  danger: "#FF6B6B",
+  dangerLight: "rgba(255, 107, 107, 0.15)",
+  success: "#34D399",
+  warning: "#FBBF24",
+};
 
 export const spacing = {
   0: 0,

@@ -90,6 +90,7 @@ const Dashboard = () => {
                 Recent Activity
               </Text>
               <TouchableOpacity
+                onPress={() => router.push("/(tabs)/employee")}
                 className="bg-black justify-between items-center"
                 style={{
                   paddingVertical: vs(5),

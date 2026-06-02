@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -14,7 +13,7 @@ import { s, vs } from "react-native-size-matters";
 
 // ─── Theme ──────────────────────────────────────────────────────────────────
 
-import { colors as COLORS } from "@/constant/theme";
+import { darkColors, lightColors } from "@/constant/theme";
 
 const LIGHT_SHADOW = {
   shadowColor: "#000",
@@ -32,35 +31,7 @@ const DARK_SHADOW = {
   elevation: 2,
 };
 
-const LIGHT_COLORS = {
-  primary: COLORS.primary,
-  primaryLight: COLORS.primaryLight,
-  surface: "#FFFFFF",
-  background: "#FFFFFF",
-  border: COLORS.border,
-  textPrimary: COLORS.textPrimary,
-  textSecondary: COLORS.textSecondary,
-  textMuted: COLORS.textMuted,
-  danger: COLORS.danger,
-  dangerLight: COLORS.dangerLight,
-  success: COLORS.success,
-  warning: COLORS.warning,
-};
 
-const DARK_COLORS = {
-  primary: "#93C5FD",
-  primaryLight: "rgba(59, 130, 246, 0.15)",
-  surface: "#1C1C1E",
-  background: "#000000",
-  border: "#2C2C2E",
-  textPrimary: "#F5F5F7",
-  textSecondary: "#AEAEB2",
-  textMuted: "#8E8E93",
-  danger: "#FF6B6B",
-  dangerLight: "rgba(255, 107, 107, 0.15)",
-  success: "#34D399",
-  warning: "#FBBF24",
-};
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -91,8 +62,7 @@ interface SectionHeaderProps {
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 const SectionHeader: React.FC<SectionHeaderProps> = ({ title, isDark }) => {
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
-  const shadow = isDark ? DARK_SHADOW : LIGHT_SHADOW;
+  const colors = isDark ? darkColors : lightColors;
 
   return (
     <View className="px-5 pt-6 pb-2">
@@ -100,7 +70,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ title, isDark }) => {
         className="font-sans-semibold"
         style={{
           fontSize: vs(10),
-          color: isDark ? colors.primary : "#000",
+          color: isDark ? colors.primary : colors.textPrimary,
           letterSpacing: 1.2,
           textTransform: "uppercase",
         }}
@@ -119,7 +89,7 @@ const ToggleItem: React.FC<ToggleItemProps> = ({
   onValueChange,
   isDark = false,
 }) => {
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
+  const colors = isDark ? darkColors : lightColors;
 
   return (
     <View
@@ -173,7 +143,7 @@ const NavItem: React.FC<NavItemProps> = ({
   onPress,
   isDark = false,
 }) => {
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
+  const colors = isDark ? darkColors : lightColors;
 
   return (
     <TouchableOpacity
@@ -246,7 +216,7 @@ const SettingsScreen: React.FC = () => {
   const [biometrics, setBiometrics] = useState(true);
   const [autoSync, setAutoSync] = useState(true);
 
-  const colors = darkMode ? DARK_COLORS : LIGHT_COLORS;
+  const colors = darkMode ? darkColors : lightColors;
 
   const handleLogout = () => {
     Alert.alert("Log out", "Are you sure you want to log out?", [
@@ -317,11 +287,7 @@ const SettingsScreen: React.FC = () => {
               backgroundColor: colors.surface,
               borderWidth: 0.5,
               borderColor: colors.border,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.04,
-              shadowRadius: 4,
-              elevation: 1,
+              ...(darkMode ? DARK_SHADOW : LIGHT_SHADOW),
             }}
           >
             <View
