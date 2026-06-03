@@ -1,12 +1,14 @@
 import { icons } from "@/constant/icons";
-import { theme } from "@/constant/theme";
+import { theme, colors } from "@/constant/theme";
 import { cn } from "@/lib/utils";
 import { useRouter } from "expo-router";
 import { styled } from "nativewind";
-import React, { useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import React, { useState, useMemo } from "react";
+import { Image, ScrollView, Text, TouchableOpacity, View, Pressable } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { s, vs } from "react-native-size-matters";
+import { employees } from "@/constant/data";
+import { Ionicons } from "@expo/vector-icons";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
@@ -14,26 +16,26 @@ const DownloadRecordsScreen = () => {
   const router = useRouter();
   const [selectedFormat, setSelectedFormat] = useState("PDF");
   const [selectedRange, setSelectedRange] = useState("This Week");
+  const [exportType, setExportType] = useState<"All" | "Department" | "Individual">("All");
+  const [selectedDept, setSelectedDept] = useState<string | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<string | null>(null);
 
   const formats = ["PDF", "CSV", "Excel"];
   const ranges = ["Today", "This Week", "This Month", "Custom Range"];
+  
+  const departments = useMemo(() => {
+    return Array.from(new Set(employees.map(e => e.department))).sort();
+  }, []);
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       {/* Header */}
-      <View className="flex-row items-center px-6 py-4 mb-6">
+      <View className="flex-row items-center px-6 py-4 mb-2">
         <TouchableOpacity
           onPress={() => router.back()}
           className="bg-white p-3 rounded-full shadow-sm border border-gray-100"
         >
-          <Image
-            source={icons.home}
-            style={{
-              width: s(20),
-              height: s(20),
-              tintColor: theme.colors.primary,
-            }}
-          />
+          <Ionicons name="arrow-back" size={s(20)} color={colors.primary} />
         </TouchableOpacity>
         <Text className="text-black font-sans-extrabold text-3xl ml-4">
           Export Records
@@ -45,7 +47,115 @@ const DownloadRecordsScreen = () => {
           paddingHorizontal: s(24),
           paddingBottom: vs(40),
         }}
+        showsVerticalScrollIndicator={false}
       >
+        {/* Export Scope */}
+        <View className="mb-8 mt-4">
+          <Text className="font-sans-bold text-lg mb-4 text-primary">
+            Export Scope
+          </Text>
+          <View className="flex-row bg-white rounded-3xl p-1 border border-gray-100 shadow-sm">
+            {(["All", "Department", "Individual"] as const).map((type) => (
+              <TouchableOpacity
+                key={type}
+                onPress={() => setExportType(type)}
+                className={cn(
+                  "flex-1 py-3 rounded-2xl items-center",
+                  exportType === type ? "bg-black" : "bg-transparent",
+                )}
+              >
+                <Text
+                  className={cn(
+                    "font-sans-bold",
+                    exportType === type ? "text-white" : "text-gray-500",
+                  )}
+                >
+                  {type}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Conditional Selections */}
+        {exportType === "Department" && (
+          <View className="mb-8">
+            <Text className="font-sans-bold text-lg mb-4 text-primary">
+              Select Department
+            </Text>
+            <View className="flex-row flex-wrap gap-3">
+              {departments.map((dept) => (
+                <TouchableOpacity
+                  key={dept}
+                  onPress={() => setSelectedDept(dept)}
+                  className={cn(
+                    "px-6 py-3 rounded-2xl border",
+                    selectedDept === dept
+                      ? "bg-accent border-accent"
+                      : "bg-white border-gray-100",
+                  )}
+                >
+                  <Text
+                    className={cn(
+                      "font-sans-semibold",
+                      selectedDept === dept ? "text-white" : "text-gray-500",
+                    )}
+                  >
+                    {dept}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {exportType === "Individual" && (
+          <View className="mb-8">
+            <Text className="font-sans-bold text-lg mb-4 text-primary">
+              Select Employee
+            </Text>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              className="flex-row gap-3"
+              contentContainerStyle={{ gap: s(12) }}
+            >
+              {employees.map((emp) => (
+                <TouchableOpacity
+                  key={emp.id}
+                  onPress={() => setSelectedEmployee(emp.id)}
+                  className={cn(
+                    "px-5 py-4 rounded-3xl border items-center justify-center min-w-[120px]",
+                    selectedEmployee === emp.id
+                      ? "bg-accent border-accent"
+                      : "bg-white border-gray-100",
+                  )}
+                >
+                  <View className="w-10 h-10 bg-gray-100 rounded-full items-center justify-center mb-2">
+                    <Ionicons name="person" size={s(18)} color={selectedEmployee === emp.id ? colors.accent : colors.primary} />
+                  </View>
+                  <Text
+                    className={cn(
+                      "font-sans-bold text-center",
+                      selectedEmployee === emp.id ? "text-white" : "text-gray-900",
+                    )}
+                  >
+                    {emp.name.split(' ')[0]}
+                  </Text>
+                  <Text
+                    className={cn(
+                      "font-sans-medium text-[10px]",
+                      selectedEmployee === emp.id ? "text-white/70" : "text-gray-400",
+                    )}
+                  >
+                    {emp.employee_id}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
         {/* Date Range Selection */}
         <View className="mb-8">
           <Text className="font-sans-bold text-lg mb-4 text-primary">
@@ -124,60 +234,17 @@ const DownloadRecordsScreen = () => {
           </View>
         </View>
 
-        {/* Recent Downloads Section */}
-        <View className="mb-10">
-          <Text className="font-sans-bold text-lg mb-4 text-primary">
-            Recent Exports
-          </Text>
-          {[1, 2].map((i) => (
-            <View
-              key={i}
-              className="flex-row items-center bg-white p-4 rounded-3xl border border-gray-50 mb-3"
-            >
-              <View className="bg-green-50 p-3 rounded-2xl mr-4">
-                <Image
-                  source={icons.record}
-                  style={{
-                    width: s(18),
-                    height: s(18),
-                    tintColor: theme.colors.success,
-                  }}
-                />
-              </View>
-              <View className="flex-1">
-                <Text className="font-sans-bold text-gray-900">
-                  Attendance_Report_May.pdf
-                </Text>
-                <Text
-                  className="font-sans-medium text-gray-400"
-                  style={{ fontSize: vs(10) }}
-                >
-                  2.4 MB • May 28, 2026
-                </Text>
-              </View>
-              <TouchableOpacity className="p-2">
-                <Image
-                  source={icons.verified}
-                  style={{
-                    width: s(20),
-                    height: s(20),
-                    tintColor: theme.colors.primary,
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
-
         {/* Action Button */}
         <TouchableOpacity
-          className="bg-black py-5 rounded-[30px] items-center shadow-xl"
+          className="bg-black py-5 rounded-[30px] items-center shadow-xl mt-4"
           activeOpacity={0.8}
         >
           <Text className="text-white font-sans-extrabold text-lg">
-            Download Records
+            Generate {selectedFormat} Report
           </Text>
         </TouchableOpacity>
+
+        <View className="h-10" />
       </ScrollView>
     </SafeAreaView>
   );

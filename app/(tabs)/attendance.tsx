@@ -1,17 +1,43 @@
 import AttendanceLogItem from "@/components/AttendanceLogItem";
 import Searchbar from "@/components/ui/Searchbar";
+import { colors } from "@/constant/theme";
 import { images } from "@/constant/images";
 import { useAttendance } from "@/lib/hooks/useAttendance";
+import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { styled } from "nativewind";
-import React from "react";
-import { FlatList, Image, Text, View } from "react-native";
+import React, { useState } from "react";
+import { FlatList, Image, Platform, Pressable, Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { s, vs } from "react-native-size-matters";
+import { Ionicons } from "@expo/vector-icons";
 
 const SafeAreaView = styled(RNSafeAreaView);
 
 const Attendance = () => {
-  const { search, setSearch, filteredEmployees } = useAttendance();
+  const { search, setSearch, filteredEmployees, selectedDate, setSelectedDate } = useAttendance();
+  const [showPicker, setShowPicker] = useState(false);
+
+  const onDateChange = (event: DateTimePickerEvent, date?: Date) => {
+    if (Platform.OS === "android") {
+      setShowPicker(false);
+    }
+    
+    if (event.type === "set" && date) {
+      setSelectedDate(date);
+    }
+  };
+
+  const clearDate = () => {
+    setSelectedDate(undefined);
+  };
+
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(date);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
@@ -40,9 +66,43 @@ const Attendance = () => {
               </Text>
             </View>
 
-            <View style={{ marginBottom: vs(25) }}>
+            <View style={{ marginBottom: vs(15) }}>
               <Searchbar value={search} onChangeText={setSearch} />
             </View>
+
+            {/* Date Selector */}
+            <View className="flex-row items-center justify-between" style={{ marginBottom: vs(25) }}>
+              <Pressable 
+                onPress={() => setShowPicker(true)}
+                className="flex-row items-center bg-white rounded-xl border border-gray-200 px-4 py-3 flex-1 mr-2"
+                style={{ height: vs(50) }}
+              >
+                <Ionicons name="calendar-outline" size={s(20)} color={colors.primary} />
+                <Text className="ml-3 font-sans-medium text-gray-700">
+                  {selectedDate ? formatDate(selectedDate) : "Select Date"}
+                </Text>
+              </Pressable>
+
+              {selectedDate && (
+                <Pressable 
+                  onPress={clearDate}
+                  className="bg-muted rounded-xl items-center justify-center"
+                  style={{ width: s(50), height: vs(50) }}
+                >
+                  <Ionicons name="close-outline" size={s(24)} color={colors.accent} />
+                </Pressable>
+              )}
+            </View>
+
+            {showPicker && (
+              <DateTimePicker
+                value={selectedDate || new Date()}
+                mode="date"
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+                onChange={onDateChange}
+                maximumDate={new Date()}
+              />
+            )}
           </>
         }
         renderItem={({ item, index }) => (
@@ -54,7 +114,7 @@ const Attendance = () => {
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center mt-10">
             <Text className="font-sans-medium text-gray-500">
-              No activity records found.
+              No activity records found for this selection.
             </Text>
           </View>
         }
