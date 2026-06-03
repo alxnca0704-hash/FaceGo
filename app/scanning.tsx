@@ -72,7 +72,7 @@ const ScanningScreen = () => {
               }}
             />
 
-            <Image
+            <Image  
               source={icons.person}
               style={{
                 width: s(120),
