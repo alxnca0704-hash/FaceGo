@@ -104,7 +104,7 @@ const ToggleItem: React.FC<ToggleItemProps> = ({
           className="w-9 h-9 rounded-xl items-center justify-center"
           style={{ backgroundColor: colors.primaryLight }}
         >
-          <Ionicons name={icon} size={s(18)} color={value ? "#FFFFFF" : colors.primary} />
+          <Ionicons name={icon} size={s(18)} color={value ? (isDark ? "#FFFFFF" : colors.primary) : colors.primary} />
         </View>
         <View className="flex-1">
           <Text
@@ -285,6 +285,7 @@ const SettingsScreen: React.FC = () => {
               className="w-14 h-14 rounded-2xl items-center justify-center"
               style={{ backgroundColor: colors.primaryLight }}
             >
+              {/* These values are fixed for an admin-only view as there's no authentication system implemented yet. */}
               <Text
                 className="font-sans-bold"
                 style={{ fontSize: vs(18), color: colors.primary }}
@@ -294,12 +295,14 @@ const SettingsScreen: React.FC = () => {
             </View>
 
             <View className="flex-1">
+              {/* These values are fixed for an admin-only view as there's no authentication system implemented yet. */}
               <Text
                 className="font-sans-bold"
                 style={{ fontSize: vs(15), color: colors.textPrimary }}
               >
                 Admin
               </Text>
+              {/* These values are fixed for an admin-only view as there's no authentication system implemented yet. */}
               <Text
                 className="font-sans-regular mt-0.5"
                 style={{ fontSize: vs(12), color: colors.textMuted }}
