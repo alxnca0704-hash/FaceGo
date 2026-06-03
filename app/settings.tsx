@@ -355,12 +355,6 @@ const SettingsScreen: React.FC = () => {
           }}
         >
           <NavItem
-            icon="information-circle-outline"
-            label="App version"
-            trailing="v1.0.0"
-            isDark={darkMode}
-          />
-          <NavItem
             icon="document-text-outline"
             label="Terms of service"
             isDark={darkMode}
@@ -368,11 +362,6 @@ const SettingsScreen: React.FC = () => {
           <NavItem
             icon="shield-outline"
             label="Privacy policy"
-            isDark={darkMode}
-          />
-          <NavItem
-            icon="help-circle-outline"
-            label="Help & support"
             isDark={darkMode}
           />
         </View>
