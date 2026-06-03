@@ -12,7 +12,7 @@ import Animated, {
 import { Ionicons } from "@expo/vector-icons";
 import { s } from "react-native-size-matters";
 
-export type FeedbackType = "success" | "delete" | "info";
+export type FeedbackType = "success" | "delete" | "info" | "error";
 
 interface FeedbackOverlayProps {
   visible: boolean;
@@ -107,6 +107,11 @@ const FeedbackOverlay = ({ visible, type, message, onFinished }: FeedbackOverlay
       icon: "information-circle-outline" as const,
       color: "#2563eb",
       bg: "#dbeafe",
+    },
+    error: {
+      icon: "alert-circle-outline" as const,
+      color: "#dc2626",
+      bg: "#fee2e2",
     },
   }[type];
 

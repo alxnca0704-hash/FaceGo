@@ -110,10 +110,12 @@ export const useEmployees = () => {
   };
 
   const deleteDepartment = (name: string) => {
-    const hasEmployees = employeeList.some(emp => emp.department === name);
-    if (hasEmployees) {
+    const affectedEmployees = employeeList.filter(emp => emp.department === name);
+    if (affectedEmployees.length > 0) {
+      const names = affectedEmployees.map(e => e.name).slice(0, 2).join(", ");
+      const suffix = affectedEmployees.length > 2 ? ` and ${affectedEmployees.length - 2} more` : "";
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      showFeedback("error", "Cannot delete: Department has employees");
+      showFeedback("error", `Cannot delete: ${names}${suffix} are assigned`);
       return;
     }
     setDepartments((prev) => prev.filter((d) => d !== name));
