@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "expo-router";
 import { styled } from "nativewind";
 import React, { useState, useMemo } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View, Pressable } from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { s, vs } from "react-native-size-matters";
 import { employees } from "@/constant/data";
@@ -140,13 +140,14 @@ const DownloadRecordsScreen = () => {
                       selectedEmployee === emp.id ? "text-white" : "text-gray-900",
                     )}
                   >
-                    {emp.name.split(' ')[0]}
+                    {(emp?.name || 'Unknown').split(' ')[0]}
                   </Text>
                   <Text
                     className={cn(
-                      "font-sans-medium text-[10px]",
+                      "font-sans-medium",
                       selectedEmployee === emp.id ? "text-white/70" : "text-gray-400",
                     )}
+                    style={{ fontSize: vs(10) }}
                   >
                     {emp.employee_id}
                   </Text>

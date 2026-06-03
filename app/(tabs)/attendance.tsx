@@ -6,7 +6,7 @@ import { useAttendance } from "@/lib/hooks/useAttendance";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { styled } from "nativewind";
 import React, { useState } from "react";
-import { FlatList, Image, Platform, Pressable, Text, View } from "react-native";
+import { FlatList, Image, Platform, Pressable, Text, View, TouchableOpacity } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { s, vs } from "react-native-size-matters";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,15 +16,33 @@ const SafeAreaView = styled(RNSafeAreaView);
 const Attendance = () => {
   const { search, setSearch, filteredEmployees, selectedDate, setSelectedDate } = useAttendance();
   const [showPicker, setShowPicker] = useState(false);
+  const [pendingDate, setPendingDate] = useState<Date | undefined>(selectedDate);
+
 
   const onDateChange = (event: DateTimePickerEvent, date?: Date) => {
     if (Platform.OS === "android") {
       setShowPicker(false);
+      if (event.type === "set" && date) {
+        setSelectedDate(date);
+      }
+    } else {
+      // On iOS, just update the pending date while scrolling
+      if (date) {
+        setPendingDate(date);
+      }
     }
-    
-    if (event.type === "set" && date) {
-      setSelectedDate(date);
+  };
+
+  const handleConfirmDate = () => {
+    if (pendingDate) {
+      setSelectedDate(pendingDate);
     }
+    setShowPicker(false);
+  };
+
+  const handleOpenPicker = () => {
+    setPendingDate(selectedDate || new Date());
+    setShowPicker(true);
   };
 
   const clearDate = () => {
@@ -73,7 +91,7 @@ const Attendance = () => {
             {/* Date Selector */}
             <View className="flex-row items-center justify-between" style={{ marginBottom: vs(25) }}>
               <Pressable 
-                onPress={() => setShowPicker(true)}
+                onPress={handleOpenPicker}
                 className="flex-row items-center bg-white rounded-xl border border-gray-200 px-4 py-3 flex-1 mr-2"
                 style={{ height: vs(50) }}
               >
@@ -95,13 +113,25 @@ const Attendance = () => {
             </View>
 
             {showPicker && (
-              <DateTimePicker
-                value={selectedDate || new Date()}
-                mode="date"
-                display={Platform.OS === "ios" ? "spinner" : "default"}
-                onChange={onDateChange}
-                maximumDate={new Date()}
-              />
+              <View className={Platform.OS === "ios" ? "bg-white rounded-2xl overflow-hidden mb-6 border border-gray-100" : ""}>
+                {Platform.OS === "ios" && (
+                  <View className="flex-row justify-between items-center px-4 py-2 border-b border-gray-100">
+                    <TouchableOpacity onPress={() => setShowPicker(false)}>
+                      <Text className="font-sans-medium text-gray-500">Cancel</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={handleConfirmDate}>
+                      <Text className="font-sans-bold text-primary">Done</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                <DateTimePicker
+                  value={pendingDate || new Date()}
+                  mode="date"
+                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  onChange={onDateChange}
+                  maximumDate={new Date()}
+                />
+              </View>
             )}
           </>
         }

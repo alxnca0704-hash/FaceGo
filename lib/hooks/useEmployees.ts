@@ -103,10 +103,19 @@ export const useEmployees = () => {
       setDepartments((prev) => [...prev, name]);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       showFeedback("success", "Department Added");
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      showFeedback("error", "Department already exists");
     }
   };
 
   const deleteDepartment = (name: string) => {
+    const hasEmployees = employeeList.some(emp => emp.department === name);
+    if (hasEmployees) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      showFeedback("error", "Cannot delete: Department has employees");
+      return;
+    }
     setDepartments((prev) => prev.filter((d) => d !== name));
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     showFeedback("delete", "Department Deleted");

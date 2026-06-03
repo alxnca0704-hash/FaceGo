@@ -82,7 +82,20 @@ const EmployeeScreen = () => {
         {
           text: "Delete Permanent",
           style: "destructive",
-          onPress: () => deleteEmployee(employee.id),
+          onPress: () => {
+            Alert.alert(
+              "Delete Permanent",
+              `Are you sure you want to permanently delete ${employee.name}?`,
+              [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Delete",
+                  style: "destructive",
+                  onPress: () => deleteEmployee(employee.id),
+                },
+              ],
+            );
+          },
         },
       ]
     );
@@ -116,8 +129,9 @@ const EmployeeScreen = () => {
                 activeTab === tab ? "text-primary" : "text-gray-500"
               }`}
             >
-              {tab === "users" ? "Add Users" : tab}
+              {tab === "users" ? "Active" : tab}
             </Text>
+
           </TouchableOpacity>
         ))}
       </View>
