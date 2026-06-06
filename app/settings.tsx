@@ -11,6 +11,9 @@ import {
 } from "react-native";
 import { s, vs } from "react-native-size-matters";
 
+import GenericAgreementModal from "@/components/ui/GenericAgreementModal";
+import FeedbackOverlay, { FeedbackType } from "@/components/ui/FeedbackOverlay";
+
 // ─── Theme ──────────────────────────────────────────────────────────────────
 
 import { darkColors, lightColors } from "@/constant/theme";
@@ -211,8 +214,17 @@ const NavItem: React.FC<NavItemProps> = ({
 
 const SettingsScreen: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
+  const [isTermsModalVisible, setTermsModalVisible] = useState(false);
+  const [isPrivacyModalVisible, setPrivacyModalVisible] = useState(false); // New state
+  const [feedbackOverlay, setFeedbackOverlay] = useState<{
+    visible: boolean;
+    type: FeedbackType;
+    message: string;
+  }>({ visible: false, type: "success", message: "" });
 
   const colors = darkMode ? darkColors : lightColors;
+
+  // Removed useEffect for loading agreement status
 
   const handleLogout = () => {
     Alert.alert("Log out", "Are you sure you want to log out?", [
@@ -240,7 +252,23 @@ const SettingsScreen: React.FC = () => {
     );
   };
 
-  
+  const handleAgreeToTerms = () => {
+    setTermsModalVisible(false);
+    setFeedbackOverlay({
+      visible: true,
+      type: "success",
+      message: "Terms agreed!",
+    });
+  };
+
+  const handleAgreeToPrivacyPolicy = () => { // New handler
+    setPrivacyModalVisible(false);
+    setFeedbackOverlay({
+      visible: true,
+      type: "success",
+      message: "Privacy Policy agreed!",
+    });
+  };
 
   return (
     <View className="flex-1" style={{ backgroundColor: colors.background }}>
@@ -361,11 +389,13 @@ const SettingsScreen: React.FC = () => {
             icon="document-text-outline"
             label="Terms of service"
             isDark={darkMode}
+            onPress={() => setTermsModalVisible(true)}
           />
           <NavItem
             icon="shield-outline"
             label="Privacy policy"
             isDark={darkMode}
+            onPress={() => setPrivacyModalVisible(true)} // Modified onPress
           />
         </View>
 
@@ -399,6 +429,36 @@ const SettingsScreen: React.FC = () => {
         {/* Bottom padding */}
         <View style={{ height: vs(40) }} />
       </ScrollView>
+
+      {/* Terms of Service Modal */}
+      <GenericAgreementModal
+        visible={isTermsModalVisible}
+        onClose={() => setTermsModalVisible(false)}
+        onAgree={handleAgreeToTerms}
+        isDark={darkMode}
+        title="Administrator Terms of Service"
+        message="By accessing the administration panel, you acknowledge that you are an authorized personnel and agree to use the system responsibly, protect confidential information, and comply with applicable organizational policies."
+        checkboxLabel="I have read and agree to the administrator terms of service"
+      />
+
+      {/* Privacy Policy Modal */}
+      <GenericAgreementModal
+        visible={isPrivacyModalVisible}
+        onClose={() => setPrivacyModalVisible(false)}
+        onAgree={handleAgreeToPrivacyPolicy}
+        isDark={darkMode}
+        title="Privacy Policy"
+        message="This system contains confidential employee information and attendance records. As an administrator, you are responsible for protecting the privacy of all data accessed through the system. Unauthorized disclosure, modification, or misuse of information is strictly prohibited. Administrative activities may be logged for security and auditing purposes."
+        checkboxLabel="I have read and agree to the Privacy Policy"
+      />
+
+      {/* Feedback Overlay */}
+      <FeedbackOverlay
+        visible={feedbackOverlay.visible}
+        type={feedbackOverlay.type}
+        message={feedbackOverlay.message}
+        onFinished={() => setFeedbackOverlay((prev) => ({ ...prev, visible: false }))}
+      />
     </View>
   );
 };
