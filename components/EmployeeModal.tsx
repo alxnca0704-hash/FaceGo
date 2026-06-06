@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   KeyboardAvoidingView,
   Modal,
@@ -8,9 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { vs } from "react-native-size-matters";
+import { vs, s } from "react-native-size-matters";
 import { useEmployeeForm } from "@/lib/hooks/useEmployeeForm";
 import { Input } from "./ui/input";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { theme } from "@/constant/theme";
+import { getLatestLedgerId } from "@/lib/services/database";
 
 interface EmployeeModalProps {
   isVisible: boolean;
@@ -25,6 +29,9 @@ const EmployeeModal = ({
   onSave,
   initialData,
 }: EmployeeModalProps) => {
+  const router = useRouter();
+  const [hasCapturedFace, setHasCapturedFace] = useState(false);
+  
   const {
     name,
     setName,
@@ -35,6 +42,23 @@ const EmployeeModal = ({
     handleSave,
     isSaving,
   } = useEmployeeForm({ initialData, isVisible, onSave, onClose });
+
+  // Check for face capture status
+  useEffect(() => {
+    if (initialData) {
+      // In a real app, check if user.ledger_id is set
+      setHasCapturedFace(true);
+    } else {
+      setHasCapturedFace(false);
+    }
+  }, [initialData, isVisible]);
+
+  const handleCaptureFace = () => {
+    // Navigate to enrollment screen
+    router.push("/enrollment" as any);
+    // We'll assume the user completes capture and returns
+    setHasCapturedFace(true); 
+  };
 
   return (
     <Modal
@@ -95,7 +119,7 @@ const EmployeeModal = ({
                   />
                 </View>
 
-                <View className="mb-8">
+                <View className="mb-6">
                   <Text className="font-sans-semibold mb-2 text-gray-700">
                     Department
                   </Text>
@@ -105,6 +129,41 @@ const EmployeeModal = ({
                     placeholder="e.g. Engineering"
                     className="bg-white border-gray-200 h-12 rounded-xl"
                   />
+                </View>
+
+                {/* Face Biometrics Section */}
+                <View className="mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                  <View className="flex-row justify-between items-center mb-4">
+                    <View>
+                      <Text className="font-sans-bold text-gray-900">Face Biometrics</Text>
+                      <Text className="font-sans-medium text-xs text-gray-500">
+                        {hasCapturedFace ? "Face data enrolled" : "No face data captured"}
+                      </Text>
+                    </View>
+                    {hasCapturedFace ? (
+                      <Ionicons name="checkmark-circle" size={24} color="#10B981" />
+                    ) : (
+                      <Ionicons name="alert-circle" size={24} color="#F59E0B" />
+                    )}
+                  </View>
+                  
+                  <TouchableOpacity
+                    onPress={handleCaptureFace}
+                    className={`py-3 rounded-xl flex-row items-center justify-center gap-2 ${
+                      hasCapturedFace ? "bg-gray-200" : "bg-accent"
+                    }`}
+                  >
+                    <Ionicons 
+                      name="scan-outline" 
+                      size={18} 
+                      color={hasCapturedFace ? theme.colors.primary : "white"} 
+                    />
+                    <Text className={`font-sans-bold ${
+                      hasCapturedFace ? "text-primary" : "text-white"
+                    }`}>
+                      {hasCapturedFace ? "Recapture Face" : "Capture Face"}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity

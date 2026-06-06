@@ -1,32 +1,56 @@
-import { employees } from "@/constant/data";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { getDbConnection } from "../services/database";
 
 export const useAttendance = () => {
   const [search, setSearch] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [logs, setLogs] = useState<any[]>([]);
+
+  const db = getDbConnection();
+
+  const loadLogs = useCallback(() => {
+    try {
+      let query = `
+        SELECT u.full_name, u.employee_id, u.department, a.date, a.time_in, a.status
+        FROM attendance_logs a
+        JOIN users u ON a.user_id = u.id
+      `;
+      
+      const records = db.getAllSync<any>(query);
+      setLogs(records);
+    } catch (error) {
+      console.error("Error loading attendance logs:", error);
+    }
+  }, [db]);
+
+  useEffect(() => {
+    loadLogs();
+  }, [loadLogs]);
 
   const filteredEmployees = useMemo(() => {
-    return employees.filter((emp) => {
+    return logs.filter((log) => {
       const matchesSearch =
-        emp.name.toLowerCase().includes(search.toLowerCase()) ||
-        emp.employee_id.toLowerCase().includes(search.toLowerCase()) ||
-        emp.department.toLowerCase().includes(search.toLowerCase());
+        log.full_name.toLowerCase().includes(search.toLowerCase()) ||
+        log.employee_id.toLowerCase().includes(search.toLowerCase()) ||
+        log.department.toLowerCase().includes(search.toLowerCase());
 
       let matchesDate = true;
       if (selectedDate) {
-        // Format: "June 1, 2026"
-        const formattedDate = new Intl.DateTimeFormat("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        }).format(selectedDate);
+        // Format from DB is usually YYYY-MM-DD
+        const year = selectedDate.getFullYear();
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedDate.getDate()).padStart(2, '0');
+        const formattedSelectedDate = `${year}-${month}-${day}`;
         
-        matchesDate = emp.date === formattedDate;
+        matchesDate = log.date === formattedSelectedDate;
       }
 
       return matchesSearch && matchesDate;
-    });
-  }, [search, selectedDate]);
+    }).map(log => ({
+        ...log,
+        name: log.full_name, // Map back to UI expectations
+    }));
+  }, [logs, search, selectedDate]);
 
   return {
     search,
@@ -34,5 +58,6 @@ export const useAttendance = () => {
     selectedDate,
     setSelectedDate,
     filteredEmployees,
+    refreshLogs: loadLogs
   };
 };

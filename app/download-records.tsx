@@ -125,7 +125,7 @@ const DownloadRecordsScreen = () => {
                   key={emp.id}
                   onPress={() => setSelectedEmployee(emp.id)}
                   className={cn(
-                    "px-5 py-4 rounded-3xl border items-center justify-center min-w-[120px]",
+                    "px-5 py-4 rounded-3xl border items-center justify-center min-w-30",
                     selectedEmployee === emp.id
                       ? "bg-accent border-accent"
                       : "bg-white border-gray-100",

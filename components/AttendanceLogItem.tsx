@@ -36,7 +36,7 @@ const AttendanceLogItem = ({
         />
         {!isLast && (
           <View
-            className="w-[1px] bg-gray-200 flex-1"
+            className="w-px bg-gray-200 flex-1"
             style={{ marginTop: vs(-2) }}
           />
         )}
@@ -121,7 +121,7 @@ const AttendanceLogItem = ({
               </View>
             </View>
 
-            <View className="w-[1px] h-8 bg-gray-200 mx-2" />
+            <View className="w-px h-8 bg-gray-200 mx-2" />
 
             <View className="flex-row items-center" style={{ gap: s(10) }}>
               <View className="bg-orange-100 p-2 rounded-xl">

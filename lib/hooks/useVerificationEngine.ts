@@ -75,6 +75,23 @@ export function useVerificationEngine() {
 
     if (bestUser && highestConfidence >= 75) {
       setIsProcessingLock(true);
+      
+      // Log attendance
+      const db = getDbConnection();
+      try {
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0];
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        db.runSync(
+          'INSERT INTO attendance_logs (user_id, date, time_in, status) VALUES (?, ?, ?, ?)',
+          [bestUser.id, dateStr, timeStr, 'Present']
+        );
+        console.log(`✅ Attendance logged for ${bestUser.full_name} at ${timeStr}`);
+      } catch (error) {
+        console.error("Error logging attendance:", error);
+      }
+
       setMatchedUser({ ...bestUser, confidenceScore: highestConfidence });
       setVerificationFeedback('VERIFIED');
     } else if (bestUser && highestConfidence > 40) {
