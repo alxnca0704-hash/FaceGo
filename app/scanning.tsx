@@ -14,12 +14,19 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
-import { s } from "react-native-size-matters";
+import { s, vs } from "react-native-size-matters";
 import {
   useCameraDevice,
   useCameraPermission,
 } from "react-native-vision-camera";
 import { Camera as FaceDetectorCamera } from "react-native-vision-camera-face-detector";
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withRepeat, 
+  withTiming, 
+  Easing 
+} from 'react-native-reanimated';
 
 const SafeAreaView = styled(RNSafeAreaView);
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -34,6 +41,22 @@ const ScanningScreen = () => {
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
   });
+
+  const scanLinePos = useSharedValue(0);
+
+  useEffect(() => {
+    scanLinePos.value = withRepeat(
+      withTiming(1, { duration: 2500, easing: Easing.inOut(Easing.sin) }),
+      -1,
+      true
+    );
+  }, []);
+
+  const SCAN_AREA_HEIGHT = s(320);
+
+  const animatedLineStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: scanLinePos.value * SCAN_AREA_HEIGHT }],
+  }));
 
   const {
     activeFaceFrame,
@@ -123,7 +146,7 @@ const ScanningScreen = () => {
             pointerEvents="none"
           >
             <View
-              className="border-2 rounded-[40px]"
+              className="border-2 rounded-[40px] overflow-hidden"
               style={{
                 width: s(260),
                 height: s(320),
@@ -135,7 +158,26 @@ const ScanningScreen = () => {
                 borderStyle: activeFaceFrame ? 'solid' : 'dashed',
                 backgroundColor: activeFaceFrame ? 'rgba(0,176,255,0.05)' : 'transparent'
               }}
-            />
+            >
+              {/* Scanning Laser Line */}
+              {!matchedUser && (
+                <Animated.View 
+                  style={[
+                    {
+                      position: 'absolute',
+                      width: '100%',
+                      height: 2,
+                      backgroundColor: activeFaceFrame ? '#00b0ff' : 'rgba(255,255,255,0.2)',
+                      shadowColor: '#00b0ff',
+                      shadowOffset: { width: 0, height: 0 },
+                      shadowOpacity: 0.8,
+                      shadowRadius: 10,
+                    },
+                    animatedLineStyle
+                  ]} 
+                />
+              )}
+            </View>
           </View>
 
           {/* Feedback Overlay */}
