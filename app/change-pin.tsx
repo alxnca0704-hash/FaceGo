@@ -11,6 +11,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context'
 import { styled } from 'nativewind'
 import { s, vs } from 'react-native-size-matters'
 import { colors } from '../constant/theme'
+import { verifyAdminPIN, setupAdminPIN } from '@/lib/security/authService'
 
 const SafeAreaView = styled(RNSafeAreaView)
 
@@ -19,8 +20,8 @@ const ChangePinScreen = () => {
   const [newPin, setNewPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
 
-  const handleChangePin = () => {
-    const pinRegex = /^\d{6}$/
+  const handleChangePin = async () => {
+    const pinRegex = /^\d{4,6}$/
 
     if (!currentPin || !newPin || !confirmPin) {
       Alert.alert('Error', 'Please fill in all fields')
@@ -28,7 +29,7 @@ const ChangePinScreen = () => {
     }
 
     if (!pinRegex.test(currentPin) || !pinRegex.test(newPin) || !pinRegex.test(confirmPin)) {
-      Alert.alert('Error', 'PINs must be 6 digits long and contain only numbers')
+      Alert.alert('Error', 'PINs must be between 4 and 6 digits long')
       return
     }
 
@@ -36,9 +37,21 @@ const ChangePinScreen = () => {
       Alert.alert('Error', 'New PINs do not match')
       return
     }
-    Alert.alert('Success', 'PIN changed successfully', [
-      { text: 'OK', onPress: () => router.back() },
-    ])
+
+    const isValid = await verifyAdminPIN(currentPin);
+    if (!isValid) {
+      Alert.alert('Error', 'Current PIN is incorrect');
+      return;
+    }
+
+    const success = await setupAdminPIN(newPin);
+    if (success) {
+      Alert.alert('Success', 'PIN changed successfully', [
+        { text: 'OK', onPress: () => router.back() },
+      ])
+    } else {
+      Alert.alert('Error', 'Failed to update PIN');
+    }
   }
 
   return (
@@ -106,12 +119,12 @@ const ChangePinScreen = () => {
             maxLength={6}
             value={confirmPin}
             onChangeText={(text) => setConfirmPin(text.replace(/[^0-9]/g, ''))}
-placeholder="Confirm new PIN"
-            />
-          </View>
+            placeholder="Confirm new PIN"
+          />
         </View>
-      </SafeAreaView>
-    )
-  }
+      </View>
+    </SafeAreaView>
+  )
+}
 
 export default ChangePinScreen

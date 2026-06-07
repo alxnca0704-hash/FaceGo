@@ -1,46 +1,52 @@
 import { icons } from "@/constant/icons";
 import { theme } from "@/constant/theme";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { styled } from "nativewind";
 import React, { useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity, View, ActivityIndicator, Dimensions } from "react-native";
+import { Image, Text, TouchableOpacity, View, ActivityIndicator, Dimensions, Alert } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 import { s, vs } from "react-native-size-matters";
 import { useCameraDevice, useCameraPermission } from "react-native-vision-camera";
 import { Camera as FaceDetectorCamera } from "react-native-vision-camera-face-detector";
-import { useVerificationEngine } from "@/lib/hooks/useVerificationEngine";
+import { useBiometricEngine, CAPTURE_STAGES } from "@/lib/hooks/useBiometricEngine";
 import { FaceLandmarkMesh } from "@/components/FaceLandmarkMesh";
+import { saveBiometricLedger } from "@/lib/services/database";
 
 const SafeAreaView = styled(RNSafeAreaView);
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-const ScanningScreen = () => {
+const EnrollmentScreen = () => {
   const router = useRouter();
   const { hasPermission, requestPermission } = useCameraPermission();
   const [facing, setFacing] = useState<'front' | 'back'>('front');
   const device = useCameraDevice(facing);
 
+  const handleEnrollmentComplete = (finalProfiles: any[]) => {
+    const result = saveBiometricLedger(finalProfiles);
+    if (result.success) {
+      Alert.alert("Enrollment Complete", "Biometric data saved successfully.", [
+        { text: "OK", onPress: () => router.back() }
+      ]);
+    } else {
+      Alert.alert("Error", "Failed to save biometric data.");
+    }
+  };
+
   const {
+    currentStageInfo,
+    currentStageIndex,
     activeFaceFrame,
-    isProcessingLock,
-    matchedUser,
-    verificationFeedback,
     handleFacesDetected,
-    resetVerification
-  } = useVerificationEngine();
+    validateAngleGate,
+    isProcessingLock,
+    resetEnrollment
+  } = useBiometricEngine(facing, handleEnrollmentComplete);
 
   useEffect(() => {
     if (!hasPermission) requestPermission();
   }, [hasPermission]);
 
-  useEffect(() => {
-    if (matchedUser) {
-      const timer = setTimeout(() => {
-        resetVerification();
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [matchedUser]);
+  const { isValid, feedback } = validateAngleGate();
 
   if (!hasPermission) {
     return (
@@ -79,7 +85,7 @@ const ScanningScreen = () => {
               }}
             />
           </TouchableOpacity>
-          <Text className="text-white font-sans-bold text-lg">Verification</Text>
+          <Text className="text-white font-sans-bold text-lg">Enrollment</Text>
           <View style={{ width: s(44) }} />
         </View>
 
@@ -88,11 +94,11 @@ const ScanningScreen = () => {
           <FaceDetectorCamera
             style={{ flex: 1 }}
             device={device}
-            isActive={!matchedUser}
+            isActive={!isProcessingLock}
             onFacesDetected={handleFacesDetected}
             onError={(error) => console.error('Camera Error:', error)}
             runLandmarks={true}
-            performanceMode="fast"
+            performanceMode="accurate"
             windowWidth={SCREEN_WIDTH}
             windowHeight={SCREEN_HEIGHT}
           />
@@ -103,66 +109,40 @@ const ScanningScreen = () => {
           <View className="absolute inset-0 items-center justify-center" pointerEvents="none">
              <View 
                className="border-2 border-white/30 rounded-[40px]"
-               style={{ width: s(260), height: s(320), borderColor: matchedUser ? theme.colors.accent : 'rgba(255,255,255,0.3)' }}
+               style={{ width: s(260), height: s(320), borderColor: isValid ? theme.colors.accent : 'rgba(255,255,255,0.3)' }}
              />
           </View>
 
           {/* Feedback Overlay */}
           <View className="absolute top-10 left-6 right-6 bg-black/80 p-4 rounded-2xl border border-white/10 items-center">
             <Text className="text-accent font-sans-bold text-xs uppercase mb-1">
-              {matchedUser ? "MATCH FOUND" : "SCANNING"}
+              {isProcessingLock ? "PROCESSING" : `STEP ${currentStageIndex + 1} OF ${CAPTURE_STAGES.length}`}
             </Text>
             <Text className="text-white font-sans-medium text-center">
-              {verificationFeedback}
+              {isProcessingLock ? "Saving vectors..." : feedback}
             </Text>
           </View>
         </View>
 
-        {/* Result Overlay */}
-        {matchedUser && (
-          <View className="absolute inset-0 bg-black/90 items-center justify-center p-8 z-20">
-            <View className="bg-surface p-6 rounded-[32px] w-full border-2 border-accent items-center">
-              <View className="bg-accent/10 p-4 rounded-full mb-4">
-                <Image source={icons.verified} style={{ width: s(40), height: s(40), tintColor: theme.colors.accent }} />
-              </View>
-              <Text className="text-accent font-sans-bold text-xl mb-4">Attendance Recorded</Text>
-              
-              <View className="w-full gap-4 mb-6">
-                <View>
-                  <Text className="text-gray-400 text-xs uppercase font-sans-medium">Employee</Text>
-                  <Text className="text-white text-lg font-sans-bold">{matchedUser.fullName}</Text>
-                </View>
-                <View>
-                  <Text className="text-gray-400 text-xs uppercase font-sans-medium">ID Number</Text>
-                  <Text className="text-primary font-sans-bold">{matchedUser.employeeId}</Text>
-                </View>
-                <View>
-                  <Text className="text-gray-400 text-xs uppercase font-sans-medium">Timestamp</Text>
-                  <Text className="text-white font-sans-medium">{matchedUser.timestamp}</Text>
-                </View>
-              </View>
-
-              <Text className="text-gray-500 font-sans-medium italic text-center">
-                Step away to reset terminal...
-              </Text>
-            </View>
+        {/* Instructions */}
+        <View className="px-10 pb-10 bg-black">
+          <View className="bg-surface/10 p-4 rounded-2xl items-center border border-white/10 mb-6">
+            <Text className="text-white font-sans-bold text-lg mb-1">{currentStageInfo.instruction}</Text>
+            <Text className="text-gray-400 font-sans-medium text-sm text-center">
+              Maintain the pose until the scanner locks your biometric signature.
+            </Text>
           </View>
-        )}
 
-        {/* Bottom Actions */}
-        {!matchedUser && (
-          <View className="px-10 pb-10">
-            <TouchableOpacity
-              onPress={() => setFacing(prev => prev === 'front' ? 'back' : 'front')}
-              className="bg-white/10 py-4 rounded-3xl items-center border border-white/20 mb-4"
-            >
-              <Text className="text-white font-sans-bold">Flip Camera</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+          <TouchableOpacity
+            onPress={() => setFacing(prev => prev === 'front' ? 'back' : 'front')}
+            className="bg-white/10 py-4 rounded-3xl items-center border border-white/20"
+          >
+            <Text className="text-white font-sans-bold">Flip Camera</Text>
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
     </View>
   );
 };
 
-export default ScanningScreen;
+export default EnrollmentScreen;
