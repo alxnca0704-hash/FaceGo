@@ -2,47 +2,72 @@ import React from 'react';
 import { View } from 'react-native';
 import { s } from 'react-native-size-matters';
 
-export const FaceLandmarkMesh = ({ face, isLocked }: { face: any; isLocked: boolean }) => {
-  const isVisible = face && face.bounds && !isLocked;
+export const FaceLandmarkMesh = ({ 
+  face, 
+  isLocked, 
+  windowWidth = 0, 
+  windowHeight = 0,
+  facing = 'front' 
+}: { 
+  face: any; 
+  isLocked: boolean;
+  windowWidth?: number;
+  windowHeight?: number;
+  facing?: 'front' | 'back';
+}) => {
+  const isVisible = face && face.bounds && !isLocked && windowWidth > 0 && windowHeight > 0;
   
   if (!isVisible) return null;
 
-  const width = face.bounds.width;
-  const height = face.bounds.height;
-  const x = face.bounds.x;
-  const y = face.bounds.y;
+  const isFront = facing === 'front';
 
   const points = [
-    face.landmarks?.LEFT_EYE, face.landmarks?.RIGHT_EYE,
-    face.landmarks?.NOSE_BASE, face.landmarks?.MOUTH_LEFT, face.landmarks?.MOUTH_RIGHT
+    face.landmarks?.LEFT_EYE || face.landmarks?.leftEye,
+    face.landmarks?.RIGHT_EYE || face.landmarks?.rightEye,
+    face.landmarks?.NOSE_BASE || face.landmarks?.noseBase,
+    face.landmarks?.MOUTH_LEFT || face.landmarks?.mouthLeft,
+    face.landmarks?.MOUTH_RIGHT || face.landmarks?.mouthRight
   ];
 
   return (
-    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} pointerEvents="none">
-      <View style={{ 
+    <View 
+      style={{ 
         position: 'absolute', 
-        top: y, 
-        left: x, 
-        width, 
-        height, 
-        borderWidth: 2, 
-        borderColor: '#00b0ff', 
-        borderRadius: s(8), 
-        borderStyle: 'dashed' 
-      }} />
+        top: 0, 
+        left: 0, 
+        width: windowWidth,
+        height: windowHeight,
+        zIndex: 50,
+      }} 
+      pointerEvents="none"
+    >
+      {/* 
+        Stationary central frame is handled in the screen components. 
+        This mesh handles the precise landmark dots tracking.
+      */}
       {points.map((pos, i) => {
         if (!pos) return null;
+        
+        // Accurate mirroring logic:
+        // When front-facing, the camera feed is mirrored. The detector coordinates 
+        // need to be flipped relative to the view width.
+        const pX = isFront ? (windowWidth - pos.x) : pos.x;
+        const pY = pos.y;
+        
         return (
           <View 
             key={i} 
             style={{ 
               position: 'absolute', 
-              top: pos.y - s(4), 
-              left: pos.x - s(4), 
-              width: s(8), 
-              height: s(8), 
-              borderRadius: s(4), 
-              backgroundColor: '#ffea00' 
+              top: pY - s(2), 
+              left: pX - s(2), 
+              width: s(4), 
+              height: s(4), 
+              borderRadius: s(2), 
+              backgroundColor: '#ffea00',
+              borderWidth: 0.5,
+              borderColor: 'white',
+              opacity: 0.9
             }} 
           />
         );

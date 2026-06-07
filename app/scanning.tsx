@@ -1,24 +1,39 @@
+import { FaceLandmarkMesh } from "@/components/FaceLandmarkMesh";
 import { icons } from "@/constant/icons";
 import { theme } from "@/constant/theme";
+import { useVerificationEngine } from "@/lib/hooks/useVerificationEngine";
 import { useRouter } from "expo-router";
 import { styled } from "nativewind";
 import React, { useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity, View, ActivityIndicator, Dimensions } from "react-native";
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
-import { s, vs } from "react-native-size-matters";
-import { useCameraDevice, useCameraPermission } from "react-native-vision-camera";
+import { s } from "react-native-size-matters";
+import {
+  useCameraDevice,
+  useCameraPermission,
+} from "react-native-vision-camera";
 import { Camera as FaceDetectorCamera } from "react-native-vision-camera-face-detector";
-import { useVerificationEngine } from "@/lib/hooks/useVerificationEngine";
-import { FaceLandmarkMesh } from "@/components/FaceLandmarkMesh";
 
 const SafeAreaView = styled(RNSafeAreaView);
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const ScanningScreen = () => {
   const router = useRouter();
   const { hasPermission, requestPermission } = useCameraPermission();
-  const [facing, setFacing] = useState<'front' | 'back'>('front');
+  const [facing, setFacing] = useState<"front" | "back">("front");
   const device = useCameraDevice(facing);
+
+  const [cameraLayout, setCameraLayout] = useState({
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
+  });
 
   const {
     activeFaceFrame,
@@ -26,7 +41,7 @@ const ScanningScreen = () => {
     matchedUser,
     verificationFeedback,
     handleFacesDetected,
-    resetVerification
+    resetVerification,
   } = useVerificationEngine();
 
   useEffect(() => {
@@ -41,17 +56,6 @@ const ScanningScreen = () => {
       return () => clearTimeout(timer);
     }
   }, [matchedUser]);
-
-  if (!hasPermission) {
-    return (
-      <View className="flex-1 bg-background justify-center items-center">
-        <Text className="text-primary mb-4">Camera permission required</Text>
-        <TouchableOpacity onPress={requestPermission} className="bg-primary px-6 py-3 rounded-xl">
-          <Text className="text-white font-sans-bold">Grant Permission</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
 
   if (!device) {
     return (
@@ -79,66 +83,116 @@ const ScanningScreen = () => {
               }}
             />
           </TouchableOpacity>
-          <Text className="text-white font-sans-bold text-lg">Verification</Text>
+          <Text className="text-white font-sans-bold text-lg">
+            Verification
+          </Text>
           <View style={{ width: s(44) }} />
         </View>
 
         {/* Camera */}
-        <View className="flex-1 relative overflow-hidden">
+        <View
+          className="flex-1 relative overflow-hidden"
+          onLayout={(event) => {
+            const { width, height } = event.nativeEvent.layout;
+            setCameraLayout({ width, height });
+          }}
+        >
           <FaceDetectorCamera
             style={{ flex: 1 }}
             device={device}
             isActive={!matchedUser}
             onFacesDetected={handleFacesDetected}
-            onError={(error) => console.error('Camera Error:', error)}
+            onError={(error) => console.error("Camera Error:", error)}
             runLandmarks={true}
             performanceMode="fast"
-            windowWidth={SCREEN_WIDTH}
-            windowHeight={SCREEN_HEIGHT}
+            windowWidth={cameraLayout.width}
+            windowHeight={cameraLayout.height}
           />
 
-          <FaceLandmarkMesh face={activeFaceFrame} isLocked={isProcessingLock} />
+          <FaceLandmarkMesh
+            face={activeFaceFrame}
+            isLocked={!!matchedUser}
+            windowWidth={cameraLayout.width}
+            windowHeight={cameraLayout.height}
+            facing={facing}
+          />
 
           {/* Overlay Guideline */}
-          <View className="absolute inset-0 items-center justify-center" pointerEvents="none">
-             <View 
-               className="border-2 border-white/30 rounded-[40px]"
-               style={{ width: s(260), height: s(320), borderColor: matchedUser ? theme.colors.accent : 'rgba(255,255,255,0.3)' }}
-             />
+          <View
+            className="absolute inset-0 items-center justify-center"
+            pointerEvents="none"
+          >
+            <View
+              className="border-2 rounded-[40px]"
+              style={{
+                width: s(260),
+                height: s(320),
+                borderColor: matchedUser
+                  ? theme.colors.accent
+                  : activeFaceFrame 
+                    ? '#00b0ff' // Blue when face is detected
+                    : "rgba(255,255,255,0.3)",
+                borderStyle: activeFaceFrame ? 'solid' : 'dashed',
+                backgroundColor: activeFaceFrame ? 'rgba(0,176,255,0.05)' : 'transparent'
+              }}
+            />
           </View>
 
           {/* Feedback Overlay */}
-          <View className="absolute top-10 left-6 right-6 bg-black/80 p-4 rounded-2xl border border-white/10 items-center">
-            <Text className="text-accent font-sans-bold text-xs uppercase mb-1">
-              {matchedUser ? "MATCH FOUND" : "SCANNING"}
-            </Text>
-            <Text className="text-white font-sans-medium text-center">
-              {verificationFeedback}
-            </Text>
-          </View>
+          {!matchedUser && (
+            <View className="absolute top-10 left-6 right-6 bg-black/80 p-4 rounded-2xl border border-white/10 items-center">
+              <Text className="text-accent font-sans-bold text-xs uppercase mb-1">
+                SCANNING
+              </Text>
+              <Text className="text-white font-sans-medium text-center">
+                {verificationFeedback}
+              </Text>
+            </View>
+          )}
         </View>
 
-        {/* Result Overlay */}
+        {/* Result Overlay - Displayed when matchedUser is not null */}
         {matchedUser && (
-          <View className="absolute inset-0 bg-black/90 items-center justify-center p-8 z-20">
-            <View className="bg-surface p-6 rounded-[32px] w-full border-2 border-accent items-center">
+          <View className="absolute inset-0 bg-black/90 items-center justify-center p-8 z-50">
+            <View className="bg-white p-6 rounded-[32px] w-full items-center">
               <View className="bg-accent/10 p-4 rounded-full mb-4">
-                <Image source={icons.verified} style={{ width: s(40), height: s(40), tintColor: theme.colors.accent }} />
+                <Image
+                  source={icons.verified}
+                  style={{
+                    width: s(40),
+                    height: s(40),
+                    tintColor: theme.colors.accent,
+                  }}
+                />
               </View>
-              <Text className="text-accent font-sans-bold text-xl mb-4">Attendance Recorded</Text>
-              
+              <Text className="text-accent font-sans-bold text-xl mb-4">
+                Attendance Recorded
+              </Text>
+
               <View className="w-full gap-4 mb-6">
                 <View>
-                  <Text className="text-gray-400 text-xs uppercase font-sans-medium">Employee</Text>
-                  <Text className="text-white text-lg font-sans-bold">{matchedUser.fullName}</Text>
+                  <Text className="text-gray-400 text-xs uppercase font-sans-medium">
+                    Employee
+                  </Text>
+                  <Text className="text-black text-lg font-sans-bold">
+                    {matchedUser.fullName}
+                  </Text>
                 </View>
                 <View>
-                  <Text className="text-gray-400 text-xs uppercase font-sans-medium">ID Number</Text>
-                  <Text className="text-primary font-sans-bold">{matchedUser.employeeId}</Text>
+                  <Text className="text-gray-400 text-xs uppercase font-sans-medium">
+                    ID Number
+                  </Text>
+                  <Text className="text-primary font-sans-bold">
+                    {matchedUser.employeeId}
+                  </Text>
                 </View>
                 <View>
-                  <Text className="text-gray-400 text-xs uppercase font-sans-medium">Timestamp</Text>
-                  <Text className="text-white font-sans-medium">{matchedUser.timestamp}</Text>
+                  <Text className="text-gray-400 text-xs uppercase font-sans-medium">
+                    Timestamp
+                  </Text>
+                  <Text className="text-black font-sans-medium">
+                    {matchedUser.timestamp}
+                  </Text>
                 </View>
               </View>
 
@@ -153,7 +207,9 @@ const ScanningScreen = () => {
         {!matchedUser && (
           <View className="px-10 pb-10">
             <TouchableOpacity
-              onPress={() => setFacing(prev => prev === 'front' ? 'back' : 'front')}
+              onPress={() =>
+                setFacing((prev) => (prev === "front" ? "back" : "front"))
+              }
               className="bg-white/10 py-4 rounded-3xl items-center border border-white/20 mb-4"
             >
               <Text className="text-white font-sans-bold">Flip Camera</Text>

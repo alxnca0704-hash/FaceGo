@@ -10,20 +10,36 @@ import { useCameraDevice, useCameraPermission } from "react-native-vision-camera
 import { Camera as FaceDetectorCamera } from "react-native-vision-camera-face-detector";
 import { useBiometricEngine, CAPTURE_STAGES } from "@/lib/hooks/useBiometricEngine";
 import { FaceLandmarkMesh } from "@/components/FaceLandmarkMesh";
-import { saveBiometricLedger } from "@/lib/services/database";
+import { saveBiometricLedger, saveUserProfile } from "@/lib/services/database";
 
 const SafeAreaView = styled(RNSafeAreaView);
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const EnrollmentScreen = () => {
   const router = useRouter();
+  const { name, employeeId, department } = useLocalSearchParams();
   const { hasPermission, requestPermission } = useCameraPermission();
   const [facing, setFacing] = useState<'front' | 'back'>('front');
   const device = useCameraDevice(facing);
 
+  const [cameraLayout, setCameraLayout] = useState({ width: SCREEN_WIDTH, height: SCREEN_HEIGHT });
+
   const handleEnrollmentComplete = (finalProfiles: any[]) => {
-    const result = saveBiometricLedger(finalProfiles);
-    if (result.success) {
+    const ledgerResult = saveBiometricLedger(finalProfiles);
+    if (ledgerResult.success) {
+      if (name && employeeId && department) {
+        const userResult = saveUserProfile(
+          employeeId as string,
+          name as string,
+          department as string,
+          ledgerResult.id!
+        );
+        if (userResult.success) {
+          Alert.alert("Success", "Employee registered successfully.");
+          router.replace("/(tabs)/employee");
+          return;
+        }
+      }
       Alert.alert("Enrollment Complete", "Biometric data saved successfully.", [
         { text: "OK", onPress: () => router.back() }
       ]);
@@ -47,17 +63,6 @@ const EnrollmentScreen = () => {
   }, [hasPermission]);
 
   const { isValid, feedback } = validateAngleGate();
-
-  if (!hasPermission) {
-    return (
-      <View className="flex-1 bg-background justify-center items-center">
-        <Text className="text-primary mb-4">Camera permission required</Text>
-        <TouchableOpacity onPress={requestPermission} className="bg-primary px-6 py-3 rounded-xl">
-          <Text className="text-white font-sans-bold">Grant Permission</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
 
   if (!device) {
     return (
@@ -90,7 +95,13 @@ const EnrollmentScreen = () => {
         </View>
 
         {/* Camera */}
-        <View className="flex-1 relative overflow-hidden">
+        <View 
+          className="flex-1 relative overflow-hidden"
+          onLayout={(event) => {
+            const { width, height } = event.nativeEvent.layout;
+            setCameraLayout({ width, height });
+          }}
+        >
           <FaceDetectorCamera
             style={{ flex: 1 }}
             device={device}
@@ -99,17 +110,33 @@ const EnrollmentScreen = () => {
             onError={(error) => console.error('Camera Error:', error)}
             runLandmarks={true}
             performanceMode="accurate"
-            windowWidth={SCREEN_WIDTH}
-            windowHeight={SCREEN_HEIGHT}
+            windowWidth={cameraLayout.width}
+            windowHeight={cameraLayout.height}
           />
 
-          <FaceLandmarkMesh face={activeFaceFrame} isLocked={isProcessingLock} />
+          <FaceLandmarkMesh 
+            face={activeFaceFrame} 
+            isLocked={isProcessingLock} 
+            windowWidth={cameraLayout.width}
+            windowHeight={cameraLayout.height}
+            facing={facing}
+          />
 
           {/* Overlay Guideline */}
           <View className="absolute inset-0 items-center justify-center" pointerEvents="none">
              <View 
-               className="border-2 border-white/30 rounded-[40px]"
-               style={{ width: s(260), height: s(320), borderColor: isValid ? theme.colors.accent : 'rgba(255,255,255,0.3)' }}
+               className="border-2 rounded-[40px]"
+               style={{ 
+                 width: s(260), 
+                 height: s(320), 
+                 borderColor: isValid 
+                   ? theme.colors.accent 
+                   : activeFaceFrame 
+                     ? '#00b0ff' 
+                     : 'rgba(255,255,255,0.3)',
+                 borderStyle: activeFaceFrame ? 'solid' : 'dashed',
+                 backgroundColor: activeFaceFrame ? 'rgba(0,176,255,0.05)' : 'transparent'
+               }}
              />
           </View>
 

@@ -98,22 +98,15 @@ export const useEmployees = () => {
         showFeedback("error", "Update Failed");
       }
     } else {
-      // For NEW employee, we need a ledger_id
-      const latestLedgerId = getLatestLedgerId();
-      if (!latestLedgerId) {
-        router.push("/enrollment");
-        showFeedback("error", "Capture face biometrics first");
-        return;
-      }
-
-      try {
-        saveUserProfile(data.employee_id!, data.name!, data.department!, latestLedgerId);
-        fetchEmployees();
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        showFeedback("success", "Employee Created");
-      } catch (e) {
-        showFeedback("error", "Creation Failed");
-      }
+      // Redirect to enrollment with user details
+      router.push({
+        pathname: "/enrollment",
+        params: {
+          name: data.name,
+          employeeId: data.employee_id,
+          department: data.department
+        }
+      });
     }
   };
 

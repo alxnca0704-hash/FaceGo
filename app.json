@@ -55,14 +55,7 @@
       ],
       "@react-native-community/datetimepicker",
       "expo-sqlite",
-      "expo-secure-store",
-      [
-        "react-native-vision-camera",
-        {
-          "cameraPermissionText": "FaceGo needs access to your camera for employee face verification.",
-          "enableMicrophonePermission": false
-        }
-      ]
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

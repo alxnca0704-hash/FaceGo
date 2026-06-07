@@ -22,42 +22,42 @@ export function useBiometricEngine(
 
   const extractFeatureVector = (face: any) => {
     const landmarks = face?.landmarks;
-    const bounds = face?.bounds;
-    if (!landmarks || !bounds) return null;
+    if (!landmarks) return null;
 
-    const leftEye   = landmarks.LEFT_EYE    || landmarks.leftEye;
-    const rightEye  = landmarks.RIGHT_EYE   || landmarks.rightEye;
-    const noseBase  = landmarks.NOSE_BASE   || landmarks.noseBase;
-    const mouthLeft = landmarks.MOUTH_LEFT  || landmarks.mouthLeft;
+    const leftEye    = landmarks.LEFT_EYE    || landmarks.leftEye;
+    const rightEye   = landmarks.RIGHT_EYE   || landmarks.rightEye;
+    const noseBase   = landmarks.NOSE_BASE   || landmarks.noseBase;
+    const mouthLeft  = landmarks.MOUTH_LEFT  || landmarks.mouthLeft;
     const mouthRight = landmarks.MOUTH_RIGHT || landmarks.mouthRight;
 
     if (!leftEye || !rightEye || !noseBase || !mouthLeft || !mouthRight) return null;
 
-    const faceScale = Math.sqrt(bounds.width * bounds.height);
-    const d_eyes = Math.sqrt(Math.pow(rightEye.x - leftEye.x, 2) + Math.pow(rightEye.y - leftEye.y, 2));
-    const d_nose_leftEye = Math.sqrt(Math.pow(noseBase.x - leftEye.x, 2) + Math.pow(noseBase.y - leftEye.y, 2));
-    const d_nose_rightEye = Math.sqrt(Math.pow(noseBase.x - rightEye.x, 2) + Math.pow(noseBase.y - rightEye.y, 2));
-    const d_mouth = Math.sqrt(Math.pow(mouthRight.x - mouthLeft.x, 2) + Math.pow(mouthRight.y - mouthLeft.y, 2));
+    // 1. Inter-ocular distance as base unit
+    const iod = Math.sqrt(Math.pow(rightEye.x - leftEye.x, 2) + Math.pow(rightEye.y - leftEye.y, 2));
+    if (iod < 5) return null;
 
+    // 2. Simplified Robust Ratios
     return [
-      d_eyes / faceScale,
-      d_nose_leftEye / faceScale,
-      d_nose_rightEye / faceScale,
-      d_mouth / faceScale
+      Math.sqrt(Math.pow(noseBase.x - leftEye.x, 2) + Math.pow(noseBase.y - leftEye.y, 2)) / iod,
+      Math.sqrt(Math.pow(noseBase.x - rightEye.x, 2) + Math.pow(noseBase.y - rightEye.y, 2)) / iod,
+      Math.sqrt(Math.pow(mouthRight.x - mouthLeft.x, 2) + Math.pow(mouthRight.y - mouthLeft.y, 2)) / iod,
+      Math.sqrt(Math.pow(noseBase.x - mouthLeft.x, 2) + Math.pow(noseBase.y - mouthLeft.y, 2)) / iod,
+      Math.sqrt(Math.pow(noseBase.x - mouthRight.x, 2) + Math.pow(noseBase.y - mouthRight.y, 2)) / iod
     ];
   };
 
   const handleFacesDetected = (faces: any[]) => {
     if (isProcessingLock) return; 
-    if (faces.length > 0) setActiveFaceFrame(faces[0]);
-    else {
+    if (faces.length > 0) {
+      setActiveFaceFrame(faces[0]);
+    } else {
       setActiveFaceFrame(null);
       stabilityFrames.current = 0; 
     }
   };
 
   const validateAngleGate = (): { isValid: boolean; feedback: string } => {
-    if (!activeFaceFrame) return { isValid: false, feedback: "ALIGN FACE IN OVAL" };
+    if (!activeFaceFrame) return { isValid: false, feedback: "ALIGN FACE IN CENTER" };
     
     const yaw = activeFaceFrame.yawAngle ?? 0;
     const pitch = activeFaceFrame.pitchAngle ?? 0;
@@ -65,9 +65,9 @@ export function useBiometricEngine(
 
     switch (currentStageInfo.id) {
       case 'front':
-        return Math.abs(yaw) <= 12 && Math.abs(pitch) <= 12
+        return Math.abs(yaw) <= 15 && Math.abs(pitch) <= 15
           ? { isValid: true, feedback: "✓ PERFECT! HOLD STILL..." }
-          : { isValid: false, feedback: "LOOK DIRECTLY AT THE SCREEN CENTER" };
+          : { isValid: false, feedback: "LOOK DIRECTLY AT THE CAMERA" };
       case 'left':
         const isLeftLocked = isFront ? yaw > 18 : yaw < -18;
         return isLeftLocked
@@ -98,7 +98,9 @@ export function useBiometricEngine(
 
     const updatedProfiles = [...capturedProfiles, { 
       angle: currentStageInfo.id, 
-      metrics: JSON.stringify(featureVector) 
+      metrics: JSON.stringify(featureVector),
+      yaw: activeFaceFrame.yawAngle ?? 0,
+      pitch: activeFaceFrame.pitchAngle ?? 0
     }];
     setCapturedProfiles(updatedProfiles);
 
