@@ -1,21 +1,58 @@
-import { employees as initialEmployees } from "@/constant/data";
 import * as Haptics from "expo-haptics";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useFeedback } from "./useFeedback";
+import { getDbConnection, getLatestLedgerId, saveUserProfile } from "@/lib/services/database";
+import { useFocusEffect, useRouter } from "expo-router";
 
 export const useEmployees = () => {
+  const router = useRouter();
+  const db = getDbConnection();
   const [search, setSearch] = useState("");
-  const [employeeList, setEmployeeList] = useState(initialEmployees);
-  const [departments, setDepartments] = useState<string[]>([
-    "Engineering",
-    "Marketing",
-    "Sales",
-    "Human Resources",
-    "Design",
-  ]);
+  const [employeeList, setEmployeeList] = useState<Employee[]>([]);
+  const [departments, setDepartments] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const { feedbackProps, showFeedback } = useFeedback();
+
+  const fetchEmployees = useCallback(() => {
+    try {
+      const records = db.getAllSync<any>(`
+        SELECT u.id, u.employee_id, u.full_name as name, u.department, u.is_active, l.profile_data 
+        FROM users u
+        INNER JOIN enrollment_ledgers l ON u.ledger_id = l.id
+        ORDER BY u.full_name ASC
+      `);
+      
+      const formatted = records.map(r => ({
+        id: r.id.toString(),
+        employee_id: r.employee_id,
+        name: r.name,
+        department: r.department,
+        status: r.is_active === 1 ? "Present" : "Inactive", // Using status mapping
+        time_in: null,
+        time_out: null
+      }));
+      setEmployeeList(formatted);
+    } catch (error) {
+      console.error("DB Fetch Error:", error);
+    }
+  }, [db]);
+
+  const fetchDepartments = useCallback(() => {
+    try {
+      const records = db.getAllSync<any>('SELECT name FROM departments ORDER BY name ASC');
+      setDepartments(records.map(r => r.name));
+    } catch (error) {
+      console.error("DB Dept Fetch Error:", error);
+    }
+  }, [db]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchEmployees();
+      fetchDepartments();
+    }, [fetchEmployees, fetchDepartments])
+  );
 
   const activeEmployees = useMemo(() => {
     return employeeList.filter((emp) => emp.status !== "Inactive" && (
@@ -47,64 +84,72 @@ export const useEmployees = () => {
     setIsModalVisible(false);
   };
 
-  const handleSaveEmployee = (data: Partial<Employee>) => {
+  const handleSaveEmployee = async (data: Partial<Employee>) => {
     if (editingEmployee) {
-      setEmployeeList((prev) =>
-        prev.map((emp) =>
-          emp.id === editingEmployee.id ? { ...emp, ...data } : emp
-        )
-      );
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      showFeedback("success", "Employee Updated");
+      try {
+        db.runSync(
+          'UPDATE users SET full_name = ?, department = ? WHERE id = ?',
+          [data.name!, data.department!, editingEmployee.id]
+        );
+        fetchEmployees();
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        showFeedback("success", "Employee Updated");
+      } catch (e) {
+        showFeedback("error", "Update Failed");
+      }
     } else {
-      const newEmployee: Employee = {
-        id: Date.now().toString(),
-        name: data.name!,
-        employee_id: data.employee_id!,
-        department: data.department!,
-        time_in: null,
-        time_out: null,
-        status: "Absent", // Default to Absent/Active
-      };
-      setEmployeeList((prev) => [newEmployee, ...prev]);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      showFeedback("success", "Employee Created");
+      // Redirect to enrollment with user details
+      router.push({
+        pathname: "/enrollment",
+        params: {
+          name: data.name,
+          employeeId: data.employee_id,
+          department: data.department
+        }
+      });
     }
   };
 
   const archiveEmployee = (id: string) => {
-    setEmployeeList((prev) =>
-      prev.map((emp) =>
-        emp.id === id ? { ...emp, status: "Inactive" } : emp
-      )
-    );
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    showFeedback("success", "Employee Archived");
+    try {
+      db.runSync('UPDATE users SET is_active = 0 WHERE id = ?', [id]);
+      fetchEmployees();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      showFeedback("success", "Employee Archived");
+    } catch (e) {
+      showFeedback("error", "Archive Failed");
+    }
   };
 
   const restoreEmployee = (id: string) => {
-    setEmployeeList((prev) =>
-      prev.map((emp) =>
-        emp.id === id ? { ...emp, status: "Absent" } : emp
-      )
-    );
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    showFeedback("success", "Employee Restored");
+    try {
+      db.runSync('UPDATE users SET is_active = 1 WHERE id = ?', [id]);
+      fetchEmployees();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      showFeedback("success", "Employee Restored");
+    } catch (e) {
+      showFeedback("error", "Restore Failed");
+    }
   };
 
   const deleteEmployee = (id: string) => {
-    setEmployeeList((prev) => prev.filter((e) => e.id !== id));
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    showFeedback("delete", "Employee Deleted");
+    try {
+      db.runSync('DELETE FROM users WHERE id = ?', [id]);
+      fetchEmployees();
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      showFeedback("delete", "Employee Deleted");
+    } catch (e) {
+      showFeedback("error", "Delete Failed");
+    }
   };
 
   const addDepartment = (name: string) => {
-    if (!departments.includes(name)) {
-      setDepartments((prev) => [...prev, name]);
+    try {
+      db.runSync('INSERT INTO departments (name) VALUES (?)', [name]);
+      fetchDepartments();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       showFeedback("success", "Department Added");
-    } else {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    } catch (error) {
       showFeedback("error", "Department already exists");
     }
   };
@@ -112,15 +157,17 @@ export const useEmployees = () => {
   const deleteDepartment = (name: string) => {
     const affectedEmployees = employeeList.filter(emp => emp.department === name);
     if (affectedEmployees.length > 0) {
-      const names = affectedEmployees.map(e => e.name).slice(0, 2).join(", ");
-      const suffix = affectedEmployees.length > 2 ? ` and ${affectedEmployees.length - 2} more` : "";
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      showFeedback("error", `Cannot delete: ${names}${suffix} are assigned`);
+      showFeedback("error", `Cannot delete: Department is in use`);
       return;
     }
-    setDepartments((prev) => prev.filter((d) => d !== name));
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    showFeedback("delete", "Department Deleted");
+    try {
+      db.runSync('DELETE FROM departments WHERE name = ?', [name]);
+      fetchDepartments();
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      showFeedback("delete", "Department Deleted");
+    } catch (e) {
+      showFeedback("error", "Delete Failed");
+    }
   };
 
   return {

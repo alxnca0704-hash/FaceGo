@@ -3,27 +3,21 @@ import { theme } from "@/constant/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Text, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import { s, vs } from "react-native-size-matters";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 const PIN_LENGTH = 4;
-const CORRECT_PIN = "1234";
 
 export default function Index() {
   const router = useRouter();
-  const [pin, setPin] = useState("");
+  const { isSetupMode, pin, setPin, isLoading, handleAuthenticate } = useAuth();
 
   useEffect(() => {
     if (pin.length === PIN_LENGTH) {
-      if (pin === CORRECT_PIN) {
-        router.replace("/(tabs)/dashboard");
-      } else {
-        Alert.alert("Incorrect PIN", "Please try again.", [
-          { text: "OK", onPress: () => setPin("") },
-        ]);
-      }
+      handleAuthenticate(pin);
     }
-  }, [pin, router]);
+  }, [pin]);
 
   const handlePress = (digit: string) => {
     if (pin.length < PIN_LENGTH) {
@@ -34,6 +28,14 @@ export default function Index() {
   const handleDelete = () => {
     setPin((prev) => prev.slice(0, -1));
   };
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-background justify-center items-center">
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
 
   const KeypadButton = ({
     value,
@@ -97,13 +99,13 @@ export default function Index() {
           className="text-primary font-sans-extrabold text-center"
           style={{ fontSize: vs(28) }}
         >
-          DENR Facego
+          {isSetupMode ? "Setup Admin PIN" : "DENR Facego"}
         </Text>
         <Text
           className="text-primary font-sans-bold text-center mt-1"
           style={{ fontSize: vs(20) }}
         >
-          Attendance
+          {isSetupMode ? "Create a 4-digit PIN" : "Attendance"}
         </Text>
       </View>
 

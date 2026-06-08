@@ -1,7 +1,7 @@
 import EmployeeCard from "@/components/EmployeeCard";
 import QuickActionCard from "@/components/QuickActionCard";
 import StatsCard from "@/components/StatsCard";
-import { QUICK_ACTIONS, STATS } from "@/constant/data";
+import { QUICK_ACTIONS } from "@/constant/data";
 import { icons } from "@/constant/icons";
 import { images } from "@/constant/images";
 import { useDashboard } from "@/lib/hooks/useDashboard";
@@ -14,7 +14,28 @@ import { s, vs } from "react-native-size-matters";
 const SafeAreaView = styled(RNSafeAreaView);
 
 const Dashboard = () => {
-  const { handleQuickAction, recentActivity, router } = useDashboard();
+  const { handleQuickAction, recentActivity, stats, router } = useDashboard();
+
+  const dynamicStats = [
+    {
+      id: "total-employees",
+      icon: icons.person,
+      name: "Total Employees",
+      total: stats.totalEmployees,
+    },
+    {
+      id: "today-attendance",
+      icon: icons.verified,
+      name: "Today's Attendance",
+      total: stats.todayAttendance,
+    },
+    {
+      id: "today-records",
+      icon: icons.record,
+      name: "Today's Records",
+      total: stats.totalRecords,
+    },
+  ];
 
   return (
     <SafeAreaView className="flex-1 bg-background pb-1" edges={["top"]}>
@@ -45,19 +66,18 @@ const Dashboard = () => {
                   </Text>
                 </View>
               </View>
-<TouchableOpacity onPress={() => {router.push("/settings")}}>
+              <TouchableOpacity onPress={() => {router.push("/settings")}}>
                 <Image
-                source={icons.burger}
-                style={{ width: s(40), height: vs(40) }}
-              />
-
-</TouchableOpacity>
+                  source={icons.burger}
+                  style={{ width: s(40), height: vs(40) }}
+                />
+              </TouchableOpacity>
             </View>
 
             {/* Stats Cards */}
             <View className="mb-8">
               <FlatList
-                data={STATS}
+                data={dynamicStats}
                 renderItem={({ item }) => <StatsCard {...item} />}
                 keyExtractor={(item) => item.id}
                 horizontal

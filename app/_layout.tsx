@@ -2,6 +2,7 @@ import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import "../global.css";
+import { initializeBiometricDatabase } from "@/lib/services/database";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -14,6 +15,9 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    // Initialize database
+    initializeBiometricDatabase();
+    
     // Hide splash only when both fonts and auth are loaded
     if (fontsLoaded) {
       SplashScreen.hideAsync();
